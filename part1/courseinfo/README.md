@@ -1,16 +1,28 @@
-# React + Vite
+# Course Information Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+_Exercise 1.1 – 1.5_
 
-Currently, two official plugins are available:
+## 🎯 Objective
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The primary goal of this project was to learn component architecture and data passing in React. I evolved the application from a single monolithic file into a clean, refactored structure.
 
-## React Compiler
+## ✨ Evolution of the Project
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Initial:** A single `App` component with hardcoded variables.
+2. **Refactor 1:** Extracted `Header`, `Content`, and `Total` components.
+3. **Refactor 2:** Abstracted the `Part` component to eliminate repetitive JSX.
+4. **Final State:** Optimized data flow using a single complex JavaScript object to manage state.
 
-## Expanding the ESLint configuration
+## 🧠 Key Learnings
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Destructuring Props:** Used ES6 destructuring to make component signatures cleaner.
+- **Immutable Data:** Practiced handling arrays and objects without direct mutation.
+- **Fragment Usage:** Utilized `<> </>` to maintain clean HTML output without unnecessary DOM nodes.
+
+## 🚀 How to Run
+
+```bash
+cd part1/courseinfo
+npm install
+npm run dev
+```
