@@ -13,11 +13,22 @@ const FeedbackStatistics = ({
   neutral: neutralCount,
   bad: badCount,
 }) => {
+  const totalVotes = goodCount + neutralCount + badCount;
+  const average =
+    totalVotes === 0
+      ? 0
+      : (goodCount * 1 + neutralCount * 0 + badCount * -1) / totalVotes;
+  const positivePercentage =
+    totalVotes === 0 ? 0 : (goodCount / totalVotes) * 100;
+
   return (
     <div>
       <p>good {goodCount}</p>
       <p>neutral {neutralCount}</p>
       <p>bad {badCount}</p>
+      <p>all {totalVotes}</p>
+      <p>average {average}</p>
+      <p>positive {positivePercentage} %</p>
     </div>
   );
 };
