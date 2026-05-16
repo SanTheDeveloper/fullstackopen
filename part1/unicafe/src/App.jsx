@@ -1,12 +1,55 @@
 import { useState } from "react";
 
+const Header = ({ title }) => {
+  return <h1>{title}</h1>;
+};
+
+const Button = ({ label, onClick }) => {
+  return <button onClick={onClick}>{label}</button>;
+};
+
+const FeedbackStatistics = ({
+  good: goodCount,
+  neutral: neutralCount,
+  bad: badCount,
+}) => {
+  return (
+    <div>
+      <p>good {goodCount}</p>
+      <p>neutral {neutralCount}</p>
+      <p>bad {badCount}</p>
+    </div>
+  );
+};
+
 const App = () => {
-  // save clicks of each button to its own state
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
-  return <div>code here</div>;
+  const handleGood = () => {
+    setGood(good + 1);
+  };
+
+  const handleNeutral = () => {
+    setNeutral(neutral + 1);
+  };
+
+  const handleBad = () => {
+    setBad(bad + 1);
+  };
+
+  return (
+    <div>
+      <Header title="give feedback" />
+      <Button label="good" onClick={handleGood} />
+      <Button label="neutral" onClick={handleNeutral} />
+      <Button label="bad" onClick={handleBad} />
+
+      <Header title="statistics" />
+      <FeedbackStatistics good={good} neutral={neutral} bad={bad} />
+    </div>
+  );
 };
 
 export default App;
