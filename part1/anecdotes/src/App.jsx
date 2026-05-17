@@ -4,11 +4,13 @@ const Header = ({ title }) => {
   return <h1>{title}</h1>;
 };
 
+// Base UI component for rendering an anecdote and its vote count
 const AnecdoteCard = ({ title, anecdote, votes }) => {
   return (
     <>
       <Header title={title} />
       <p>{anecdote}</p>
+      {/* Nullish coalescing (??) provides a fallback of 0 if the index hasn't been voted on yet */}
       <p>has {votes ?? 0} votes</p>
     </>
   );
@@ -18,6 +20,7 @@ const Button = ({ label, onClick }) => {
   return <button onClick={onClick}>{label}</button>;
 };
 
+// Composite component responsible for the interactive "daily" anecdote section
 const AnecdoteOfTheDay = ({
   title,
   anecdote,
@@ -34,7 +37,9 @@ const AnecdoteOfTheDay = ({
   );
 };
 
+// Display component that safely handles the "No votes" edge case
 const MostVotedAnecdote = ({ title, highestVotedAnecdote }) => {
+  // Edge Case Handling: If highestVotedAnecdote is null, display a fallback UI
   if (!highestVotedAnecdote) {
     return (
       <>
@@ -55,7 +60,9 @@ const MostVotedAnecdote = ({ title, highestVotedAnecdote }) => {
   );
 };
 
+// App Root
 const App = () => {
+  // Static Data
   const anecdotes = [
     "If it hurts, do it more often.",
     "Adding manpower to a late software project makes it later!",
@@ -67,22 +74,29 @@ const App = () => {
     "The only way to go fast, is to go well.",
   ];
 
+  // Application State
   const [selected, setSelected] = useState(0);
+
+  // Complex State: Using an Object (Hash Map) to store votes.
+  // Format: { index: voteCount } e.g., { 0: 2, 3: 5 }
   const [votes, setVotes] = useState({});
 
+  // Helper function to generate a random index based on array length
   const randomNumGen = () => {
     return Math.floor(Math.random() * anecdotes.length);
   };
 
+  // Algorithmic function to derive the winning anecdote dynamically
   const findMostVotedAnecdote = () => {
+    // If the object is empty, return null to trigger the fallback UI
     if (Object.keys(votes).length === 0) return null;
 
+    // Use .reduce to iterate over the keys and find the one with the highest value
     const mostVotedIndex = Object.keys(votes).reduce((a, b) => {
       return votes[a] > votes[b] ? a : b;
     });
 
     return {
-      index: Number(mostVotedIndex),
       anecdote: anecdotes[mostVotedIndex],
       votes: votes[mostVotedIndex],
     };
@@ -95,6 +109,8 @@ const App = () => {
 
   const handleVotes = () => {
     const currentVotes = votes[selected] ?? 0;
+    // IMMUTABILITY: Create a new object copy using the spread operator (...votes)
+    // rather than mutating the existing state object directly.
     setVotes({ ...votes, [selected]: currentVotes + 1 });
   };
 
@@ -107,6 +123,7 @@ const App = () => {
         handleNextAnecdote={handleNextAnecdote}
         handleVotes={handleVotes}
       />
+      {/* Execute the finder function during the render cycle to pass down the calculated result */}
       <MostVotedAnecdote
         title="Anecdote with most votes"
         highestVotedAnecdote={findMostVotedAnecdote()}
