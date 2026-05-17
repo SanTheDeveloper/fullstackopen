@@ -14,16 +14,17 @@ const Statistics = ({
   bad: badCount,
 }) => {
   const totalVotes = goodCount + neutralCount + badCount;
+
+  if (totalVotes === 0) {
+    return <p>No feedback given</p>;
+  }
+
   const average =
-    totalVotes === 0
-      ? 0
-      : (goodCount * 1 + neutralCount * 0 + badCount * -1) / totalVotes;
-  const positivePercentage =
-    totalVotes === 0 ? 0 : (goodCount / totalVotes) * 100;
+    (goodCount * 1 + neutralCount * 0 + badCount * -1) / totalVotes;
+  const positivePercentage = (goodCount / totalVotes) * 100;
 
   return (
     <div>
-      <Header title="statistics" />
       <p>good {goodCount}</p>
       <p>neutral {neutralCount}</p>
       <p>bad {badCount}</p>
@@ -58,6 +59,7 @@ const App = () => {
       <Button label="neutral" onClick={handleNeutral} />
       <Button label="bad" onClick={handleBad} />
 
+      <Header title="statistics" />
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   );
