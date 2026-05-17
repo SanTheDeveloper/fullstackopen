@@ -8,7 +8,7 @@ const Button = ({ label, onClick }) => {
   return <button onClick={onClick}>{label}</button>;
 };
 
-const FeedbackStatistics = ({
+const Statistics = ({
   good: goodCount,
   neutral: neutralCount,
   bad: badCount,
@@ -23,6 +23,7 @@ const FeedbackStatistics = ({
 
   return (
     <div>
+      <Header title="statistics" />
       <p>good {goodCount}</p>
       <p>neutral {neutralCount}</p>
       <p>bad {badCount}</p>
@@ -57,8 +58,7 @@ const App = () => {
       <Button label="neutral" onClick={handleNeutral} />
       <Button label="bad" onClick={handleBad} />
 
-      <Header title="statistics" />
-      <FeedbackStatistics good={good} neutral={neutral} bad={bad} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   );
 };
