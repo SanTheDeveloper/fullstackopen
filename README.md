@@ -5,7 +5,7 @@ This repository serves as a technical log of my journey through the Fullstack Op
 ## 📂 Repository Architecture
 
 - **Part 0: Fundamentals of Web Apps** - Analysis of traditional vs. modern web architectures.
-- **Part 1: Fundamentals of React** - Component-based architecture, JSX, and state management.
+- **Part 1: Fundamentals of React** - Component-based architecture, JSX, event handling, and complex state management.
 
 ## 🛠️ Tech Stack
 
