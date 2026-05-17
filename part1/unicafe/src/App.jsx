@@ -10,9 +10,10 @@ const Button = ({ label, onClick }) => {
 
 const StatisticsLine = ({ text, value }) => {
   return (
-    <p>
-      {text} {value}
-    </p>
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
   );
 };
 
@@ -33,12 +34,19 @@ const Statistics = ({
 
   return (
     <div>
-      <StatisticsLine text="good" value={goodCount} />
-      <StatisticsLine text="neutral" value={neutralCount} />
-      <StatisticsLine text="bad" value={badCount} />
-      <StatisticsLine text="all" value={totalVotes} />
-      <StatisticsLine text="average" value={average} />
-      <StatisticsLine text="positive" value={`${positivePercentage} %`} />
+      <table>
+        <tbody>
+          <StatisticsLine text="good" value={goodCount} />
+          <StatisticsLine text="neutral" value={neutralCount} />
+          <StatisticsLine text="bad" value={badCount} />
+          <StatisticsLine text="all" value={totalVotes} />
+          <StatisticsLine
+            text="average"
+            value={`${Math.floor(average * 10) / 10}`}
+          />
+          <StatisticsLine text="positive" value={`${positivePercentage} %`} />
+        </tbody>
+      </table>
     </div>
   );
 };
