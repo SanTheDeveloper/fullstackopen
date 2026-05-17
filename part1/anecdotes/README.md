@@ -1,16 +1,14 @@
-# React + Vite
+# Software Engineering Anecdotes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+_Exercises 1.12 - 1.14_
 
-Currently, two official plugins are available:
+## 🎯 Objective
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+A React application that displays random software engineering anecdotes and allows users to vote for their favorites. It dynamically calculates and displays the anecdote with the highest vote count.
 
-## React Compiler
+## 🧠 Key Learnings
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Complex State Management:** Managed state using a JavaScript Object (Hash Map) rather than an Array to track votes dynamically without pre-allocation.
+- **Immutability:** Strictly adhered to React's immutability rules by using the spread operator (`...`) to create shallow copies of state objects before updating them.
+- **Algorithmic Rendering:** Utilized `Object.keys()` and `.reduce()` to derive the maximum vote count and its corresponding index on the fly during the render cycle.
+- **Component Modularity:** Abstracted UI logic into specific, single-responsibility components (`AnecdoteCard`, `AnecdoteOfTheDay`, `MostVotedAnecdote`).
