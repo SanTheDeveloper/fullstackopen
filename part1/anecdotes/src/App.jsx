@@ -1,8 +1,13 @@
 import { useState } from "react";
 
-const Anecdote = ({ anecdote, votes }) => {
+const Header = ({ title }) => {
+  return <h1>{title}</h1>;
+};
+
+const AnecdoteCard = ({ title, anecdote, votes }) => {
   return (
     <>
+      <Header title={title} />
       <p>{anecdote}</p>
       <p>has {votes ?? 0} votes</p>
     </>
@@ -11,6 +16,43 @@ const Anecdote = ({ anecdote, votes }) => {
 
 const Button = ({ label, onClick }) => {
   return <button onClick={onClick}>{label}</button>;
+};
+
+const AnecdoteOfTheDay = ({
+  title,
+  anecdote,
+  votes,
+  handleNextAnecdote,
+  handleVotes,
+}) => {
+  return (
+    <>
+      <AnecdoteCard title={title} anecdote={anecdote} votes={votes} />
+      <Button label="vote" onClick={handleVotes} />
+      <Button label="next anecdote" onClick={handleNextAnecdote} />
+    </>
+  );
+};
+
+const MostVotedAnecdote = ({ title, highestVotedAnecdote }) => {
+  if (!highestVotedAnecdote) {
+    return (
+      <>
+        <Header title={title} />
+        <p>No votes cast yet. Be the first to vote!</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <AnecdoteCard
+        title={title}
+        anecdote={highestVotedAnecdote.anecdote}
+        votes={highestVotedAnecdote.votes}
+      />
+    </>
+  );
 };
 
 const App = () => {
@@ -32,6 +74,20 @@ const App = () => {
     return Math.floor(Math.random() * anecdotes.length);
   };
 
+  const findMostVotedAnecdote = () => {
+    if (Object.keys(votes).length === 0) return null;
+
+    const mostVotedIndex = Object.keys(votes).reduce((a, b) => {
+      return votes[a] > votes[b] ? a : b;
+    });
+
+    return {
+      index: Number(mostVotedIndex),
+      anecdote: anecdotes[mostVotedIndex],
+      votes: votes[mostVotedIndex],
+    };
+  };
+
   const handleNextAnecdote = () => {
     const randomNum = randomNumGen();
     setSelected(randomNum);
@@ -44,9 +100,17 @@ const App = () => {
 
   return (
     <div>
-      <Anecdote anecdote={anecdotes[selected]} votes={votes[selected]} />
-      <Button label="vote" onClick={handleVotes} />
-      <Button label="next anecdote" onClick={handleNextAnecdote} />
+      <AnecdoteOfTheDay
+        title="Anecdote of the day"
+        anecdote={anecdotes[selected]}
+        votes={votes[selected]}
+        handleNextAnecdote={handleNextAnecdote}
+        handleVotes={handleVotes}
+      />
+      <MostVotedAnecdote
+        title="Anecdote with most votes"
+        highestVotedAnecdote={findMostVotedAnecdote()}
+      />
     </div>
   );
 };
