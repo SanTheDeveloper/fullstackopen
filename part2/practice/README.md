@@ -1,5 +1,29 @@
-### 2b: Forms
+# 📡 Part 2: Communicating with Server
 
-- **Controlled Components:** Learned how to bind form inputs directly to React `useState` variables.
-- **Event Handling:** Utilized `onChange` handlers to update state on every keystroke, keeping the UI and React state perfectly synced.
-- **Form Submission:** Attached `onSubmit` handlers to `<form>` tags and used `event.preventDefault()` to stop the browser from refreshing the page upon submission.
+This directory contains my experimental code, architectural refactors, and notes from the Fullstack Open Part 2 curriculum. This module bridges the gap between static React frontends and dynamic, data-driven applications.
+
+## 📚 Major Milestones & Concepts Explored
+
+### 2a: Rendering a Collection & Modules
+
+- **Dynamic Rendering:** Replaced hardcoded UI elements by utilizing the JavaScript `.map()` function to render arrays of data dynamically.
+- **The `key` Attribute:** Learned the internal mechanics of React's virtual DOM and why unique `key` props are strictly required for mapped list items.
+- **Component Extraction:** Refactored monolithic files into modular, scalable architectures. Extracted UI elements into a dedicated `/components` directory, ensuring each module has a single responsibility.
+- **Data Aggregation:** Utilized the `.reduce()` method to calculate derived totals from complex arrays of objects.
+
+### 2b: Forms & User Input
+
+- **Controlled Components:** Mastered binding HTML `<input>` fields directly to React `useState` hooks, ensuring the UI and the data model are perfectly synchronized on every keystroke.
+- **Event Handling:** Implemented `onChange` and `onSubmit` handlers, utilizing `event.preventDefault()` to override default browser behaviors (like page reloads on submission).
+- **Derived State:** Implemented real-time search filtering. Learned the architectural best practice of calculating filtered data on the fly during the render cycle, rather than storing duplicate/filtered arrays in their own state.
+
+### 2c: Getting Data from Server
+
+- **REST APIs & Promises:** Transitioned from hardcoded mock data to fetching data over HTTP. Used the `axios` library to execute asynchronous `GET` requests and resolve JavaScript Promises.
+- **The Component Lifecycle:** Mastered the `useEffect` hook. Used it with an empty dependency array `[]` to trigger data fetching safely and exactly once immediately after the component's initial render.
+- **Local Backend Simulation:** Configured `json-server` as a mock REST API database during development to simulate real-world frontend/backend separation.
+
+## 📁 Projects in this Section
+
+- `/courseinfo` - Refactored the Part 1 course engine to handle dynamic arrays and multiple courses using `.map()` and component modules.
+- `/phonebook` - A React-based contact management application featuring controlled forms, input sanitization, and a simulated mock backend.
