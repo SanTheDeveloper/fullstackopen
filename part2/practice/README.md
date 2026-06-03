@@ -23,6 +23,12 @@ This directory contains my experimental code, architectural refactors, and notes
 - **The Component Lifecycle:** Mastered the `useEffect` hook. Used it with an empty dependency array `[]` to trigger data fetching safely and exactly once immediately after the component's initial render.
 - **Local Backend Simulation:** Configured `json-server` as a mock REST API database during development to simulate real-world frontend/backend separation.
 
+### 2d: Altering Data in Server
+
+- **RESTful CRUD Operations:** Learned how to execute `POST`, `PUT`, and `DELETE` requests using `axios` to permanently modify data on a backend server.
+- **Service Modules:** Abstracted backend communication logic into a dedicated service module to keep React components strictly focused on UI rendering.
+- **Promise Chaining:** Handled asynchronous server responses to dynamically update the React state _only_ after the database confirms the transaction was successful.
+
 ## 📁 Projects in this Section
 
 - `/courseinfo` - Refactored the Part 1 course engine to handle dynamic arrays and multiple courses using `.map()` and component modules.

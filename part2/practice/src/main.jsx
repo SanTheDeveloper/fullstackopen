@@ -1,47 +1,64 @@
-// Import ReactDOM for rendering React components into the browser DOM
 import ReactDOM from "react-dom/client";
-
-// Import axios for making HTTP requests (currently not used)
-// import axios from "axios";
-
-// Import the root App component
 import App from "./App";
 
-// Create React root and render App component
+// Create React root and render the application
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 
 /*
 ==============================================================================
-* RUNTIME FLOW (CURRENT VERSION)
+* MAIN.JSX RESPONSIBILITY
 ==============================================================================
 
-Browser loads page
-        ↓
-main.jsx executes
-        ↓
-Imports are loaded
-        ↓
-document.getElementById("root")
-        ↓
-ReactDOM.createRoot(...)
-        ↓
-render(<App />)
-        ↓
-App component function executes
-        ↓
-App returns JSX
-        ↓
-React creates Virtual DOM
-        ↓
-React updates Browser DOM
-        ↓
-UI appears on screen
+main.jsx is the entry point of the React application.
+
+Its job is simple:
+
+1. Import the root App component
+2. Find the HTML element with id="root"
+3. Create a React root
+4. Render <App />
+
+After App is rendered, most application logic happens inside
+components, not inside main.jsx.
 
 */
 
 /*
 ==============================================================================
-* DATA FLOW (CURRENT VERSION)
+* RUNTIME FLOW
+==============================================================================
+
+Browser loads page
+    ↓
+main.jsx executes
+    ↓
+Imports are loaded
+    ↓
+document.getElementById("root")
+    ↓
+ReactDOM.createRoot(...)
+    ↓
+render(<App />)
+    ↓
+App() executes
+    ↓
+App returns JSX
+    ↓
+React creates Virtual DOM
+    ↓
+React updates Browser DOM
+    ↓
+UI appears on screen
+
+Future updates start from state changes inside components.
+
+main.jsx normally runs only once.
+
+*/
+
+/*
+==============================================================================
+* DATA FLOW
 ==============================================================================
 
 main.jsx
@@ -50,21 +67,13 @@ main.jsx
     ↓
 App Component
     ↓
-JSX
-    ↓
-React DOM
+Child Components
     ↓
 Browser UI
 
-main.jsx itself contains almost no application data.
+main.jsx does not manage application data.
 
-Its primary responsibility is:
-
-Mount React Application
-        ↓
-Render Root Component
-        ↓
-Hand Control To App.jsx
+Its primary purpose is application startup.
 
 */
 
@@ -74,121 +83,37 @@ Hand Control To App.jsx
 ==============================================================================
 
 document.getElementById("root")
-        ↓
+    ↓
 Gets DOM element from index.html
 
 createRoot(...)
-        ↓
+    ↓
 Creates React Root
 
 render(<App />)
-        ↓
+    ↓
 Calls App component
 
 App()
-        ↓
+    ↓
 Returns JSX
 
 React
-        ↓
+    ↓
 Creates Virtual DOM tree
 
 React
-        ↓
-Converts Virtual DOM into Browser DOM
+    ↓
+Builds Browser DOM
 
 Browser
-        ↓
+    ↓
 Displays UI
 
-Future state updates will start from App.jsx,
-not from main.jsx.
+Later state updates happen inside React components,
+not inside main.jsx.
 
 */
-
-/*
-==============================================================================
-* PREVIOUS VERSION: FETCHING NOTES FROM BACKEND
-==============================================================================
-
-Learning Goal:
-Move data storage from frontend into backend.
-
-Execution Flow:
-
-axios.get(...)
-        ↓
-HTTP GET request sent
-
-Backend
-        ↓
-Returns JSON
-
-response.data
-        ↓
-Contains notes array
-
-<App notes={notes} />
-        ↓
-Pass notes through props
-
-App
-        ↓
-Displays notes
-
-*/
-
-// axios.get("http://localhost:3001/notes").then((response) => {
-//   // Extract response body
-//   const notes = response.data;
-
-//   // Render App with fetched notes
-//   ReactDOM.createRoot(document.getElementById("root")).render(
-//     <App notes={notes} />,
-//   );
-// });
-
-/*
-==============================================================================
-* OLDER VERSION: HARDCODED DATA
-==============================================================================
-
-Before backend development, notes were stored directly
-inside the frontend.
-
-Data Flow:
-
-Hardcoded Array
-        ↓
-Props
-        ↓
-App Component
-        ↓
-Rendered Notes
-
-*/
-
-// const notes = [
-//   {
-//     id: 1,
-//     content: "HTML is easy",
-//     important: true,
-//   },
-//   {
-//     id: 2,
-//     content: "Browser can execute only JavaScript",
-//     important: false,
-//   },
-//   {
-//     id: 3,
-//     content: "GET and POST are the most important methods of HTTP protocol",
-//     important: true,
-//   },
-// ];
-
-// ReactDOM.createRoot(document.getElementById("root")).render(
-//   <App notes={notes} />,
-// );
 
 /*
 ==============================================================================
@@ -196,24 +121,26 @@ Rendered Notes
 ==============================================================================
 
 Version 1
-Hardcoded Notes
-        ↓
+Hardcoded Data
+    ↓
 Version 2
-Notes Fetched From Backend
-        ↓
-Version 3
-App Rendered Directly
-
-Full Stack Open Progression:
-
-Static Data
-        ↓
 Props
-        ↓
-State
-        ↓
+    ↓
+Version 3
+Local State
+    ↓
+Version 4
+useEffect
+    ↓
+Version 5
 HTTP Requests
-        ↓
-Backend Integration
+    ↓
+Version 6
+Server-Side Data
+
+Current Version:
+
+main.jsx is only responsible for bootstrapping
+the React application.
 
 */

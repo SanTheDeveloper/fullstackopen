@@ -1,79 +1,151 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Note from "./components/Note";
+import noteService from "./services/notes";
 
 const App = () => {
-  // Stores all notes currently loaded into the application
-  // Initially empty until data arrives from the backend
+  // Stores all notes currently loaded from the backend
   const [notes, setNotes] = useState([]);
 
-  // Stores the current value of the input field
-  const [newNote, setNewNote] = useState("a new note...");
+  // Stores the current input field value
+  const [newNote, setNewNote] = useState("");
 
-  // Controls whether all notes or only important notes are shown
+  // Controls whether all notes or only important notes are displayed
   const [showAll, setShowAll] = useState(true);
 
   /*
-  Side Effect: Fetch notes from backend
+  ==============================================================================
+  PREVIOUS APPROACH: DIRECT AXIOS CALLS INSIDE COMPONENT
+  ==============================================================================
 
-  React renders first.
-  After rendering, useEffect runs.
-
-  The empty dependency array [] means:
-
-  - Run once after the initial render
-  - Do not run on future re-renders
-*/
   useEffect(() => {
-    console.log("effect"); // Shows when the effect executes
-
-    // Send HTTP GET request to backend
     axios.get("http://localhost:3001/notes").then((response) => {
-      console.log("promise fulfilled"); // Runs after server responds
-
-      // Store received notes in React state
       setNotes(response.data);
     });
   }, []);
 
-  // Runs when the form is submitted
-  const addNote = (event) => {
-    // Prevent browser from reloading the page
-    event.preventDefault();
+  Part 2d introduced a service layer:
 
-    // Create a new note object from the current input value
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5, // Randomly assign importance
-      id: String(notes.length + 1), // Generate a simple id
+  App.jsx
+      ↓
+  noteService
+      ↓
+  axios
+      ↓
+  Backend
+
+  */
+
+  // Fetch notes from the server after the initial render
+  useEffect(() => {
+    noteService.getAll().then((initialNotes) => {
+      setNotes(initialNotes);
+    });
+  }, []);
+
+  // Toggle the importance status of a note
+  const toggleImportanceOf = (id) => {
+    // Find the note that should be updated
+    const note = notes.find((n) => n.id === id);
+
+    // Create a copy with the updated importance value
+    const changedNote = {
+      ...note,
+      important: !note.important,
     };
 
-    // Create a new array and add the new note
-    setNotes(notes.concat(noteObject));
+    /*
+    ============================================================================
+    PREVIOUS APPROACH: DIRECT PUT REQUEST
+    ============================================================================
 
-    // Clear the input field after saving
-    setNewNote("");
+    const url = `http://localhost:3001/notes/${id}`;
+
+    axios.put(url, changedNote).then((response) => {
+      setNotes(
+        notes.map((note) =>
+          note.id === id ? response.data : note
+        )
+      );
+    });
+
+    */
+
+    noteService
+      .update(id, changedNote)
+      .then((returnedNote) => {
+        setNotes(notes.map((note) => (note.id === id ? returnedNote : note)));
+      })
+      .catch(() => {
+        alert(`the note '${note.content}' was already deleted from server`);
+
+        // Remove stale note from local state
+        setNotes(notes.filter((n) => n.id !== id));
+      });
   };
 
-  // Runs every time the user types into the input
-  const handleNoteChange = (event) => {
-    // Current value inside the input field
-    console.log(event.target.value);
+  // Create a new note
+  const addNote = (event) => {
+    event.preventDefault();
 
-    // Update state with the latest input value
+    // Prepare request payload
+    const noteObject = {
+      content: newNote,
+      important: Math.random() < 0.5,
+    };
+
+    /*
+    ============================================================================
+    PREVIOUS APPROACH: LOCAL STATE ONLY
+    ============================================================================
+
+    const noteObject = {
+      content: newNote,
+      important: Math.random() < 0.5,
+      id: String(notes.length + 1),
+    };
+
+    setNotes(notes.concat(noteObject));
+    setNewNote("");
+
+    Problem:
+    Data disappeared after page refresh.
+
+    */
+
+    /*
+    ============================================================================
+    PREVIOUS APPROACH: DIRECT POST REQUEST
+    ============================================================================
+
+    axios.post(
+      "http://localhost:3001/notes",
+      noteObject
+    ).then((response) => {
+      setNotes(notes.concat(response.data));
+      setNewNote("");
+    });
+
+    */
+
+    noteService.create(noteObject).then((returnedNote) => {
+      setNotes(notes.concat(returnedNote));
+      setNewNote("");
+    });
+  };
+
+  // Keep React state synchronized with the input field
+  const handleNoteChange = (event) => {
     setNewNote(event.target.value);
   };
 
   // Determine which notes should be displayed
-  const notesToShow = showAll
-    ? notes // Show all notes
-    : notes.filter((note) => note.important); // Show only important notes
+  const notesToShow = showAll ? notes : notes.filter((note) => note.important);
 
   return (
     <div>
       <h1>Notes</h1>
 
-      {/* Toggle between all notes and important notes */}
+      {/* Toggle between showing all notes and only important notes */}
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? "important" : "all"}
@@ -81,48 +153,21 @@ const App = () => {
       </div>
 
       <ul>
-        {/* ===================================================================
-            VERSION 1: HARDCODED RENDERING
-            Only works for exactly 3 notes.
-            Not scalable.
-        ==================================================================== */}
-
-        {/* <li>{notes[0].content}</li>
-        <li>{notes[1].content}</li>
-        <li>{notes[2].content}</li> */}
-
-        {/* ===================================================================
-            VERSION 2: DYNAMIC RENDERING WITH map()
-            Works for any number of notes.
-            Rendering logic still lives directly here.
-        ==================================================================== */}
-
-        {/* {notes.map((note) => (
-          <li key={note.id}>{note.content}</li>
-        ))} */}
-
-        {/* ===================================================================
-            VERSION 3: COMPONENT-BASED RENDERING
-            Delegates note rendering to Note component.
-            Better separation of concerns.
-        ==================================================================== */}
-
-        {/* ===================================================================
-            VERSION 4: FILTERED RENDERING
-            Uses notesToShow instead of notes.
-            Can display all notes or only important notes.
-        ==================================================================== */}
-
         {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         ))}
       </ul>
 
       {/* Controlled form */}
       <form onSubmit={addNote}>
         <input
-          value={newNote} // Input value comes from React state
-          onChange={handleNoteChange} // Update state on every keystroke
+          value={newNote}
+          onChange={handleNoteChange}
+          placeholder="a new note..."
         />
 
         <button type="submit">save</button>
@@ -135,68 +180,65 @@ export default App;
 
 /*
 ==============================================================================
-* RUNTIME FLOW: INITIAL PAGE LOAD + FETCHING NOTES
+COMPONENT RESPONSIBILITY
+==============================================================================
+
+App.jsx is the main container component.
+
+Responsibilities:
+
+- Manage application state
+- Fetch notes from backend
+- Create notes
+- Update notes
+- Filter notes
+- Pass props to child components
+
+This component coordinates the application.
+
+*/
+
+/*
+==============================================================================
+RUNTIME FLOW: INITIAL PAGE LOAD
 ==============================================================================
 
 Browser loads page
     ↓
-main.jsx executes
+main.jsx renders <App />
     ↓
-render(<App />)
-    ↓
-App() executes for the first time
+App() executes
 
 State Initialization:
 
-notes    = []
-newNote  = "a new note..."
-showAll  = true
+notes   = []
+newNote = ""
+showAll = true
 
-    ↓
-notesToShow calculated
     ↓
 JSX returned
     ↓
-React creates Virtual DOM
-    ↓
 Browser displays UI
-
-At this point:
-- Input field is visible
-- Notes list is empty
-
     ↓
 useEffect() executes
     ↓
+noteService.getAll()
+    ↓
 axios.get(...)
     ↓
-HTTP GET request sent to backend
+HTTP request sent
 
 --------------------------------------------------
 
-Backend receives request
-    ↓
-Backend returns notes JSON
+Backend returns notes
     ↓
 Promise resolves
     ↓
-.then(...) callback executes
-    ↓
-response.data contains notes
-    ↓
-setNotes(response.data)
-    ↓
-React stores new notes state
+setNotes(initialNotes)
     ↓
 React schedules re-render
     ↓
 App() executes again
-    ↓
-notesToShow recalculated
-    ↓
-map() creates Note components
-    ↓
-React updates DOM
     ↓
 Notes appear on screen
 
@@ -204,41 +246,35 @@ Notes appear on screen
 
 /*
 ==============================================================================
-* RUNTIME FLOW: USER TYPES IN INPUT
+RUNTIME FLOW: USER TYPES IN INPUT
 ==============================================================================
 
 User presses key
     ↓
 onChange event fires
     ↓
-handleNoteChange(event)
+handleNoteChange()
     ↓
-event.target.value contains latest text
+setNewNote(...)
     ↓
-setNewNote(value)
-    ↓
-React stores updated state
+React stores new state
     ↓
 React schedules re-render
     ↓
 App() executes again
     ↓
-input value updated
-    ↓
-Browser UI updated
-
-This happens on every keystroke.
+Input updates
 
 */
 
 /*
 ==============================================================================
-* RUNTIME FLOW: USER SAVES NOTE
+RUNTIME FLOW: USER CREATES NOTE
 ==============================================================================
 
 User clicks Save
     ↓
-Form submit event fires
+Form submit event
     ↓
 addNote(event)
     ↓
@@ -246,9 +282,21 @@ event.preventDefault()
     ↓
 Create noteObject
     ↓
-setNotes(notes.concat(noteObject))
+noteService.create(noteObject)
     ↓
-React stores new notes array
+axios.post(...)
+    ↓
+HTTP POST request sent
+
+--------------------------------------------------
+
+Backend stores note
+    ↓
+Backend returns created note
+    ↓
+Promise resolves
+    ↓
+setNotes(notes.concat(returnedNote))
     ↓
 setNewNote("")
     ↓
@@ -256,75 +304,100 @@ React schedules re-render
     ↓
 App() executes again
     ↓
-notesToShow recalculated
-    ↓
-map() creates Note components
-    ↓
-React updates DOM
-    ↓
-New note appears
-
-Current version only updates local React state.
-
-Backend is NOT updated yet.
-
-If page refreshes:
-    ↓
-Local note disappears
-    ↓
-Server notes are loaded again
+UI updates
 
 */
 
 /*
 ==============================================================================
-* RUNTIME FLOW: FILTER BUTTON CLICK
+RUNTIME FLOW: TOGGLING IMPORTANCE
 ==============================================================================
 
 User clicks button
     ↓
+toggleImportance()
+    ↓
+toggleImportanceOf(id)
+    ↓
+Find note in state
+    ↓
+Create changedNote
+    ↓
+noteService.update(...)
+    ↓
+axios.put(...)
+    ↓
+HTTP PUT request sent
+
+--------------------------------------------------
+
+Success
+
+Backend updates note
+    ↓
+Returns updated note
+    ↓
+setNotes(...)
+    ↓
+React re-renders
+    ↓
+UI updates
+
+--------------------------------------------------
+
+Failure
+
+Note no longer exists on server
+    ↓
+Promise rejected
+    ↓
+catch(...)
+    ↓
+alert(...)
+    ↓
+Remove stale note from state
+    ↓
+UI updates
+
+*/
+
+/*
+==============================================================================
+RUNTIME FLOW: FILTERING NOTES
+==============================================================================
+
+User clicks filter button
+    ↓
 setShowAll(!showAll)
     ↓
-showAll state changes
-
-true  → false
-or
-false → true
-
+showAll changes
     ↓
-React schedules re-render
-    ↓
-App() executes again
+React re-renders
     ↓
 notesToShow recalculated
 
 showAll === true
     ↓
-Show all notes
+Display all notes
 
 showAll === false
     ↓
-Show only important notes
-
-    ↓
-React updates DOM
-    ↓
-UI reflects selected filter
+Display only important notes
 
 */
 
 /*
 ==============================================================================
-* DATA FLOW: SERVER → STATE → UI
+DATA FLOW: SERVER → UI
 ==============================================================================
 
-Backend
-    ↓
-HTTP Response
+Backend Database
     ↓
 axios
     ↓
-response.data
+noteService
+    ↓
+App.jsx
     ↓
 setNotes(...)
     ↓
@@ -338,20 +411,16 @@ map()
     ↓
 Browser UI
 
-This is the primary data flow of the application.
-
 */
 
 /*
 ==============================================================================
-* DATA FLOW: ADDING A NOTE
+DATA FLOW: CREATING NOTES
 ==============================================================================
 
 Input Field
     ↓
 event.target.value
-    ↓
-handleNoteChange()
     ↓
 newNote state
     ↓
@@ -359,53 +428,21 @@ addNote()
     ↓
 noteObject
     ↓
-setNotes()
+noteService.create()
+    ↓
+Backend
+    ↓
+Returned Note
     ↓
 notes state
     ↓
-notesToShow
-    ↓
-map()
-    ↓
-<Note />
-    ↓
-Browser UI
+UI
 
 */
 
 /*
 ==============================================================================
-* DATA FLOW: FILTERING NOTES
-==============================================================================
-
-showAll state
-    ↓
-notesToShow calculation
-
-showAll === true
-    ↓
-notesToShow = notes
-
-showAll === false
-    ↓
-notes.filter(note => note.important)
-
-    ↓
-map()
-    ↓
-<Note />
-    ↓
-Browser UI
-
-No data is modified.
-
-Filtering only changes what gets displayed.
-
-*/
-
-/*
-==============================================================================
-* UNDERSTANDING useEffect
+UNDERSTANDING useEffect
 ==============================================================================
 
 useEffect is used for side effects.
@@ -416,45 +453,22 @@ Examples:
 - Timers
 - WebSocket connections
 - Local storage access
-- DOM manipulation
 
---------------------------------------------------
+In this application:
 
-Why not fetch directly inside App()?
-
-BAD:
-
-App()
+App renders
     ↓
-axios.get(...)
+useEffect runs
+    ↓
+noteService.getAll()
+    ↓
+Backend returns notes
     ↓
 setNotes(...)
     ↓
 Re-render
-    ↓
-App()
-    ↓
-axios.get(...)
-    ↓
-Infinite loop
 
---------------------------------------------------
-
-GOOD:
-
-App()
-    ↓
-Render UI
-    ↓
-useEffect runs
-    ↓
-Fetch data
-    ↓
-Update state
-    ↓
-Re-render
-
-The dependency array:
+Dependency Array:
 
 []
 
@@ -466,73 +480,10 @@ Run only once after the first render.
 
 /*
 ==============================================================================
-* REACT INTERNALS
+CONTROLLED INPUT PATTERN
 ==============================================================================
 
-App is a React Function Component.
-
-Every render means:
-
-App()
-    ↓
-Function executes from top to bottom
-    ↓
-useState values retrieved
-    ↓
-Derived values calculated
-    ↓
-JSX created
-    ↓
-React compares new JSX tree with previous tree
-    ↓
-(Reconciliation)
-    ↓
-Only changed DOM nodes updated
-    ↓
-Browser UI refreshed
-
---------------------------------------------------
-
-State Updates
-
-setNotes(...)
-setNewNote(...)
-setShowAll(...)
-
-do NOT immediately update the DOM.
-
-Instead:
-
-setState(...)
-    ↓
-React stores new state
-    ↓
-React schedules re-render
-    ↓
-App() executes again
-    ↓
-New JSX generated
-    ↓
-DOM updated if necessary
-
---------------------------------------------------
-
-React does NOT:
-
-- Reload the page
-- Recreate the entire DOM
-- Re-render unrelated browser elements
-
-React updates only what changed.
-
-*/
-
-/*
-==============================================================================
-* CONTROLLED INPUT PATTERN
-==============================================================================
-
-The input field is controlled by React state.
+Input value comes from React state.
 
 newNote state
     ↓
@@ -548,84 +499,148 @@ setNewNote(...)
     ↓
 State updated
     ↓
-Re-render
-    ↓
 Input updated
 
-React becomes the single source of truth.
-
-The displayed value always comes from state.
+React is the single source of truth.
 
 */
 
 /*
 ==============================================================================
-* WHY concat() INSTEAD OF push()
+REACT INTERNALS
 ==============================================================================
 
-GOOD:
+State Update
 
-setNotes(notes.concat(noteObject))
+setNotes(...)
+setNewNote(...)
+setShowAll(...)
 
-concat():
+    ↓
 
-- Creates a new array
-- Does not modify existing state
-- Works well with React
+React stores new state
+    ↓
+Schedules re-render
+    ↓
+App() executes again
+    ↓
+New JSX tree created
+    ↓
+React compares old vs new tree
+    ↓
+(Reconciliation)
+    ↓
+Only changed DOM nodes updated
+
+React does NOT:
+
+- Reload the page
+- Recreate the entire DOM
+
+React updates only what changed.
+
+*/
+
+/*
+==============================================================================
+SERVICE LAYER ARCHITECTURE
+==============================================================================
+
+Current Architecture
+
+App.jsx
+    ↓
+noteService
+    ↓
+axios
+    ↓
+Backend API
+
+Why?
+
+Without Service Layer:
+
+App.jsx
+    ↓
+axios.get(...)
+axios.post(...)
+axios.put(...)
+
+Component handles:
+
+- UI
+- State
+- HTTP requests
 
 --------------------------------------------------
 
-BAD:
+With Service Layer:
 
-notes.push(noteObject)
+App.jsx
+    ↓
+noteService.getAll()
+noteService.create()
+noteService.update()
 
-Problems:
+Component focuses on:
 
-- Mutates existing array
-- Changes state directly
-- Can cause bugs
-- Makes state updates harder to track
+- UI
+- State
 
-React prefers immutable updates.
+Service focuses on:
+
+- HTTP communication
+
+This separation improves maintainability.
 
 */
 
 /*
 ==============================================================================
-* APPLICATION EVOLUTION
+APPLICATION EVOLUTION
 ==============================================================================
 
 Version 1
 Hardcoded Notes
     ↓
 Version 2
-Dynamic Rendering Using map()
+Rendering Lists With map()
     ↓
 Version 3
 Separate Note Component
     ↓
 Version 4
-Filtering With showAll State
+Filtering With State
     ↓
 Version 5
-Notes Stored In React State
+Controlled Inputs
     ↓
 Version 6
-Fetching Notes From Backend Using axios
+Fetching Notes With axios
     ↓
-Version 7 (Next Step)
-Creating Notes On Backend
+Version 7
+Creating Notes With POST Requests
     ↓
 Version 8
-Updating Notes On Backend
+Updating Notes With PUT Requests
     ↓
 Version 9
-Deleting Notes On Backend
+Move HTTP Logic To Service Module
     ↓
 Version 10
-Persistent Database Storage
+Server Synchronization + Error Handling
 
-Key Learning Progression:
+Current Architecture
+
+App.jsx
+    ↓
+noteService
+    ↓
+axios
+    ↓
+Backend API
+
+Key Learning Progression
 
 Static Data
     ↓
@@ -635,14 +650,14 @@ State
     ↓
 Controlled Inputs
     ↓
-Component Rendering
-    ↓
 useEffect
     ↓
 HTTP Requests
     ↓
-Backend Communication
+CRUD Operations
     ↓
-Full Stack Applications
+Service Layer
+    ↓
+Frontend ↔ Backend Architecture
 
 */
