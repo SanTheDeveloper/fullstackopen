@@ -7,25 +7,27 @@ const PersonForm = ({
 }) => {
   return (
     <form onSubmit={addPerson}>
-      <div>
-        name:{" "}
+      <div className="form-group">
+        <label>Name</label>
+
         <input
           value={newName}
           onChange={handlePersonChange}
-          placeholder="Add Name"
+          placeholder="Enter contact name"
         />
       </div>
-      <div>
-        number:{" "}
+
+      <div className="form-group">
+        <label>Number</label>
+
         <input
           value={newNumber}
           onChange={handleNumberChange}
-          placeholder="Add Number"
+          placeholder="Enter phone number"
         />
       </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
+
+      <button type="submit">Add Contact</button>
     </form>
   );
 };

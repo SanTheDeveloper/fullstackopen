@@ -1,0 +1,252 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+
+  color: #f8fafc;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+#root {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* App */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.app-header p {
+  color: #94a3b8;
+}
+
+/* Cards */
+
+.card {
+  background: rgba(15, 23, 42, 0.8);
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 18px;
+
+  padding: 24px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.card h2 {
+  margin-bottom: 18px;
+  color: #f8fafc;
+}
+
+/* Filter */
+
+.filter-container input {
+  max-width: 400px;
+}
+
+/* Form */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+/* Inputs */
+
+input {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  border: 1px solid #334155;
+
+  border-radius: 10px;
+
+  background: #1e293b;
+
+  color: white;
+
+  font-size: 1rem;
+}
+
+input::placeholder {
+  color: #64748b;
+}
+
+input:focus {
+  outline: none;
+
+  border-color: #3b82f6;
+
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Buttons */
+
+button {
+  border: none;
+
+  border-radius: 10px;
+
+  padding: 12px 18px;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+form button {
+  align-self: flex-start;
+
+  background: #2563eb;
+
+  color: white;
+}
+
+form button:hover {
+  background: #1d4ed8;
+}
+
+/* Contacts */
+
+.contacts-list {
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-card {
+  background: #111827;
+
+  border: 1px solid #1f2937;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #3b82f6;
+}
+
+.person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.person-name {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.person-number {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}
+
+/* Notifications */
+
+.success,
+.error {
+  padding: 14px 18px;
+
+  border-radius: 12px;
+
+  font-weight: 600;
+
+  animation: slideDown 0.3s ease;
+}
+
+.success {
+  color: #166534;
+  background: #dcfce7;
+  border: 2px solid #22c55e;
+}
+
+.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 2px solid #ef4444;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

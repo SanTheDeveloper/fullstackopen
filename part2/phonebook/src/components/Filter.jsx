@@ -1,11 +1,10 @@
 const Filter = ({ personFilter, handleFilterChange }) => {
   return (
-    <div>
-      filter shown with{" "}
+    <div className="filter-container">
       <input
         value={personFilter}
         onChange={handleFilterChange}
-        placeholder="Filter Name"
+        placeholder="Search by name..."
       />
     </div>
   );

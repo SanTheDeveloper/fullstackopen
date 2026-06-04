@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import personService from "./services/persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [personFilter, setPersonFilter] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -47,13 +49,25 @@ const App = () => {
       personService
         .update(existingPerson.id, updatedPerson)
         .then((returnedPerson) => {
-          setPersons(
-            persons.map((person) =>
+          setPersons((prevPersons) =>
+            prevPersons.map((person) =>
               person.id === existingPerson.id ? returnedPerson : person,
             ),
           );
           setNewName("");
           setNewNumber("");
+
+          showNotification(`Updated ${existingPerson.name}`, "success");
+        })
+        .catch((error) => {
+          console.error("Error: ", error.message);
+          showNotification(
+            `Information of ${existingPerson.name} has already been removed from server`,
+            "error",
+          );
+          setPersons((prevPersons) =>
+            prevPersons.filter((person) => person.id !== existingPerson.id),
+          );
         });
 
       return;
@@ -65,7 +79,8 @@ const App = () => {
     };
 
     personService.create(newPerson).then((returnedPerson) => {
-      setPersons([...persons, returnedPerson]);
+      showNotification(`Added ${trimmedName}`, "success");
+      setPersons((prevPersons) => [...prevPersons, returnedPerson]);
       setNewName("");
       setNewNumber("");
     });
@@ -90,14 +105,30 @@ const App = () => {
       personService
         .remove(id)
         .then(() => {
-          setPersons(persons.filter((person) => person.id !== id));
+          showNotification(`Deleted ${personToDelete.name}`, "success");
+          setPersons((prevPersons) =>
+            prevPersons.filter((person) => person.id !== id),
+          );
         })
         .catch((error) => {
-          console.error("error: ", error.message);
-          alert(`${personToDelete.name} has already been removed from server`);
-          setPersons(persons.filter((person) => person.id !== id));
+          console.error("Error:", error.message);
+          showNotification(
+            `Information of ${personToDelete.name} has already been removed from server`,
+            "error",
+          );
+          setPersons((prevPersons) =>
+            prevPersons.filter((person) => person.id !== id),
+          );
         });
     }
+  };
+
+  const showNotification = (message, status) => {
+    setNotification({ message, status });
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   const personToShow = personFilter
@@ -107,25 +138,40 @@ const App = () => {
     : persons;
 
   return (
-    <div>
-      <h2>Phonebook</h2>
+    <div className="app-container">
+      <header className="app-header">
+        <h1>📞 Phonebook</h1>
+        <p>Manage your contacts with ease</p>
+      </header>
 
-      <Filter
-        personFilter={personFilter}
-        handleFilterChange={handleFilterChange}
-      />
+      <Notification notification={notification} />
 
-      <h2>Add a new</h2>
-      <PersonForm
-        addPerson={addPerson}
-        newName={newName}
-        handlePersonChange={handlePersonChange}
-        newNumber={newNumber}
-        handleNumberChange={handleNumberChange}
-      />
+      <section className="card">
+        <h2>🔍 Search Contacts</h2>
 
-      <h2>Numbers</h2>
-      <Persons personToShow={personToShow} onDelete={handleDeletePerson} />
+        <Filter
+          personFilter={personFilter}
+          handleFilterChange={handleFilterChange}
+        />
+      </section>
+
+      <section className="card">
+        <h2>➕ Add Contact</h2>
+
+        <PersonForm
+          addPerson={addPerson}
+          newName={newName}
+          handlePersonChange={handlePersonChange}
+          newNumber={newNumber}
+          handleNumberChange={handleNumberChange}
+        />
+      </section>
+
+      <section className="card">
+        <h2>📋 Contacts</h2>
+
+        <Persons personToShow={personToShow} onDelete={handleDeletePerson} />
+      </section>
     </div>
   );
 };
