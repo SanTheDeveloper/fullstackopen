@@ -1,4 +1,14 @@
 const Persons = ({ personToShow, onDelete }) => {
+  if (personToShow.length === 0) {
+    return (
+      <div className="empty-state">
+        <span className="empty-icon">📭</span>
+        <h3>No contacts yet</h3>
+        <p>Add your first contact using the form above.</p>
+      </div>
+    );
+  }
+
   return (
     <ul className="contacts-list">
       {personToShow.map((person) => (
