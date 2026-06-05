@@ -1,34 +1,29 @@
 {
   "notes": [
     {
-      "id": "1",
       "content": "HTML is easy",
-      "important": true
+      "important": false,
+      "id": "AfTY15y2WF0"
     },
     {
-      "id": "2",
       "content": "Browser can execute only JavaScript",
-      "important": false
+      "important": true,
+      "id": "tZakhvGAJlg"
     },
     {
-      "id": "3",
       "content": "GET and POST are the most important methods of HTTP protocol",
-      "important": true
+      "important": false,
+      "id": "M1-42oXCNuI"
     },
     {
       "content": "POST is used to add data",
-      "important": true,
-      "id": "9Kxj98XbKOI"
+      "important": false,
+      "id": "R7qyl6hDy6o"
     },
     {
       "content": "PUT is used to update resource",
-      "important": false,
-      "id": "CL2lDSTOcPs"
-    },
-    {
-      "content": "Is this working",
       "important": true,
-      "id": "ZQfexYkf30c"
+      "id": "AhjT2eXzqmk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
