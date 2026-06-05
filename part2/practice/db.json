@@ -24,6 +24,11 @@
       "content": "PUT is used to update resource",
       "important": false,
       "id": "CL2lDSTOcPs"
+    },
+    {
+      "content": "Is this working",
+      "important": true,
+      "id": "ZQfexYkf30c"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

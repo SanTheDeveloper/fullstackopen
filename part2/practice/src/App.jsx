@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
+import Footer from "./components/Footer";
 import Note from "./components/Note";
+import Notification from "./components/Notification";
 import noteService from "./services/notes";
 
 const App = () => {
   // Stores all notes currently loaded from the backend
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(null);
 
   // Stores the current input field value
   const [newNote, setNewNote] = useState("");
 
   // Controls whether all notes or only important notes are displayed
   const [showAll, setShowAll] = useState(true);
+
+  const [errorMessage, setErrorMessage] = useState(null);
 
   /*
   ==============================================================================
@@ -41,6 +45,11 @@ const App = () => {
       setNotes(initialNotes);
     });
   }, []);
+
+  // do not render anything if notes is still null
+  if (!notes) {
+    return null;
+  }
 
   // Toggle the importance status of a note
   const toggleImportanceOf = (id) => {
@@ -76,7 +85,29 @@ const App = () => {
         setNotes(notes.map((note) => (note.id === id ? returnedNote : note)));
       })
       .catch(() => {
-        alert(`the note '${note.content}' was already deleted from server`);
+        /* this implementations leads to race conditions 
+        where user 1 click delete button and 5 sec timer starts 
+        but after 3 sec click another delete button 
+        starting another 5 sec setTimeout but abruptly 
+        ends after 2 sec 
+        solution -> store id of running timeout using useRef and clear it
+        before starting new one ensure only recent timer is allowed to wipe
+        the state
+        */
+
+        /*
+        Engineering Rule: Use CSS classes for static layout. 
+        Use inline style objects for dynamic, state-driven values (e.g., XY coordinates, widths).
+        */
+
+        // Set the error state
+        setErrorMessage(
+          `Note '${note.content}' was already removed from server`,
+        );
+        // Start the countdown
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
 
         // Remove stale note from local state
         setNotes(notes.filter((n) => n.id !== id));
@@ -144,7 +175,8 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
-
+      <Notification message={errorMessage} />
+      <br />
       {/* Toggle between showing all notes and only important notes */}
       <div>
         <button onClick={() => setShowAll(!showAll)}>
@@ -172,6 +204,7 @@ const App = () => {
 
         <button type="submit">save</button>
       </form>
+      <Footer />
     </div>
   );
 };
