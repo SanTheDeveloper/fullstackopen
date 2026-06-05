@@ -29,7 +29,14 @@ This directory contains my experimental code, architectural refactors, and notes
 - **Service Modules:** Abstracted backend communication logic into a dedicated service module to keep React components strictly focused on UI rendering.
 - **Promise Chaining:** Handled asynchronous server responses to dynamically update the React state _only_ after the database confirms the transaction was successful.
 
+### 2e: Adding Styles to React App
+
+- **CSS Integration:** Explored different methods for styling React applications, transitioning from basic inline styles to importing external CSS files.
+- **Dynamic Styling & UI Feedback:** Implemented conditional CSS classes to render dynamic UI elements, such as distinct success (green) and error (red) notification banners based on application state.
+- **Graceful Error Handling:** Handled edge cases (like 404 Not Found errors) gracefully by self-healing the local UI state and providing immediate visual feedback to the user.
+
 ## 📁 Projects in this Section
 
 - `/courseinfo` - Refactored the Part 1 course engine to handle dynamic arrays and multiple courses using `.map()` and component modules.
-- `/phonebook` - A React-based contact management application featuring controlled forms, input sanitization, and a simulated mock backend.
+- `/phonebook` - A React-based contact management application featuring controlled forms, input sanitization, dynamic notifications, and a simulated mock backend.
+- `/exchange-rate` - A standalone application built to drill the `useEffect` hook, asynchronous Axios fetching, and controlled inputs against a live third-party REST API.
