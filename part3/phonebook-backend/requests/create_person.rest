@@ -1,0 +1,8 @@
+@baseUrl = http://localhost:3001
+POST {{baseUrl}}/api/persons
+Content-Type: application/json
+
+{
+  "name": "Randy Orton",
+  "number": "123-4567890"
+}
