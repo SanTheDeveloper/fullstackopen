@@ -1,0 +1,4 @@
+@baseUrl = http://localhost:3001
+GET {{baseUrl}}/api/notes
+
+# ### acts as delimiter for two separate distinct requests
