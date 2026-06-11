@@ -2,18 +2,24 @@
 
 This repository serves as a technical log of my journey through the Fullstack Open curriculum. It contains a collection of projects and deep-dive practice modules focusing on building scalable, performant, and clean full-stack applications.
 
-## 📂 Repository Architecture
+## 🏗️ Repository Architecture
 
-- **Part 0: Fundamentals of Web Apps** - Analysis of traditional vs. modern web architectures and HTTP request lifecycles.
-- **Part 1: Fundamentals of React** - Component-based architecture, JSX, event handling, and complex state management.
-- **Part 2: Communicating with Server** - Asynchronous data flow, React component lifecycles (`useEffect`), controlled forms, REST API integration, and dynamic CSS styling.
-- **Part 3: Programming a Server with Node.js and Express** - RESTful API design, Express middleware, request logging, and headless API testing. _(In Progress)_
+To simulate a professional engineering environment, this repository utilizes an **App-Centric Architecture**, decoupling applications from specific timeline-based course parts.
 
-## 🚀 Featured Projects
+- **`/phonebook-app` (Primary Assignment Track)** A full-stack contact management system. Features a React SPA synchronized with a custom Node.js/Express REST API. Implements controlled forms, dynamic state filtering, backend data validation, and request logging.
+- **`/notes-app` (Continuous Tutorial Track)**
+  A full-stack note-taking application used as the primary sandbox for integrating new architectural concepts, React rendering flows, and Express routing logic as the curriculum advances.
+- **`/course-exercises` (Core Fundamentals)**
+  A flattened collection of standalone modules and isolated practice environments built to master foundational React concepts.
+  - _Data for Countries:_ Integrates multiple third-party APIs (REST Countries, OpenWeatherMap) with dynamic UI rendering.
+  - _Courseinfo, Unicafe, Anecdotes:_ Architectural deep-dives into complex state management, component extraction, and dynamic array rendering (`.map`, `.reduce`).
 
-- **Data for Countries:** A React application integrating multiple third-party APIs (REST Countries, OpenWeatherMap) with dynamic UI rendering and environment variable security.
-- **Phonebook Manager:** A full-stack contact management system. Features a React UI synchronized with a custom Node.js/Express REST API, complete with data validation and Morgan request logging.
-- **Exchange Rate Sandbox:** An isolated React module built to drill asynchronous `axios` data fetching and state synchronization.
+## 🗺️ Curriculum Progress
+
+- **Part 0:** Fundamentals of Web Apps (Completed)
+- **Part 1:** Fundamentals of React (Completed)
+- **Part 2:** Communicating with Server (Completed)
+- **Part 3:** Node.js and Express API Design (In Progress)
 
 ## 🛠️ Tech Stack
 
