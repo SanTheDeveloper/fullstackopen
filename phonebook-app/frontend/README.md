@@ -1,39 +1,33 @@
-# 📞 Phonebook Manager
+# 📞 Phonebook Manager - Frontend UI
 
-_Full Stack Open - Part 2 (Exercises 2.6 - 2.17)_
+_Full Stack Open - Part 2_
 
 ## 🎯 Objective
 
-A full-stack React contact management application. It allows users to create, read, update, and delete (CRUD) contact records. It features input validation, a real-time search filter, asynchronous data persistence via a simulated REST API, and a modern, responsive UI.
+The React frontend for the contact management application. It handles UI rendering, client-side input validation, real-time search filtering, and asynchronous data synchronization with the backend API.
 
 ## 🧠 Key Learnings & Architecture
 
 - **Controlled Components:** Managed form inputs directly via React state (`useState`), ensuring the UI and the underlying data model are perfectly synchronized on every keystroke.
 - **Derived State:** Implemented the search filter by calculating the filtered array dynamically during the render cycle, avoiding the anti-pattern of storing duplicated/filtered data in its own state hook.
-- **Component Extraction:** Refactored a monolithic application into a modular architecture. State and business logic are maintained in the root `App` component, while UI rendering is delegated to single-responsibility child components (`Filter`, `PersonForm`, `Persons`, `Notification`).
-- **Service Modules (Separation of Concerns):** Abstracted all Axios HTTP requests (`GET`, `POST`, `PUT`, `DELETE`) into a dedicated `services/persons.js` module, keeping the React UI components clean and focused strictly on rendering.
-- **Asynchronous State Management:** Utilized Promises and `.then()` chaining to ensure the local React state only updates _after_ the backend database successfully confirms the transaction, maintaining strict data integrity.
-- **Error Handling & State Synchronization:** Implemented `.catch()` blocks to gracefully handle edge cases (e.g., attempting to update or delete a record that was already removed from the server). The application self-heals by alerting the user and filtering the missing record out of the local state.
-- **Dynamic UI Notifications:** Built a temporary, auto-dismissing notification system (`setTimeout`) to provide users with visual success and error feedback based on server responses.
+- **Component Extraction:** Refactored a monolithic application into a modular architecture. State and business logic are maintained in the root `App` component, while UI rendering is delegated to single-responsibility child components.
+- **Service Modules:** Abstracted all Axios HTTP requests into a dedicated `services/persons.js` module, keeping the React components clean.
+- **Asynchronous State Management:** Utilized Promises to ensure the local React state only updates _after_ the backend database successfully confirms the transaction.
+- **Error Handling:** Implemented `.catch()` blocks to gracefully handle edge cases (e.g., updating a record that was already removed). The application self-heals by alerting the user and filtering the missing record out of local state.
 
 ## 🎨 UI/UX Features
 
 - **Modern CSS styling:** Implemented a dark theme utilizing CSS flexbox, glassmorphism (`backdrop-filter`), and responsive layouts.
-- **Visual Feedback:** Dynamic CSS classes are applied to the `Notification` component to distinctly color-code success (green) and error (red) states, complete with slide-down animations.
+- **Visual Feedback:** Dynamic CSS classes are applied to the `Notification` component to distinctly color-code success and error states.
 
-## 🚀 How to Run
+## 🚀 How to Run Locally
 
-This application requires two terminal windows to run both the frontend and the mock database concurrently.
+To run the frontend UI in isolation:
 
-**Terminal 1: Start the Frontend**
+1. Install dependencies:
+   npm install
 
-```bash
-npm install
-npm run dev
-```
+2. Start the Vite development server:
+   npm run dev
 
-**Terminal 2: Start the Backend**
-
-```bash
-npm run server
-```
+_Note: For the application to fully function, the Express backend must also be running. See the root repository README for full-stack instructions._
