@@ -1,0 +1,295 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+
+  color: #f8fafc;
+
+  min-height: 100vh;
+
+  padding: 40px 20px;
+}
+
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ======================
+   Header
+====================== */
+
+.app-header {
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.app-header p {
+  color: #94a3b8;
+}
+
+/* ======================
+   Search
+====================== */
+
+.search-form {
+  background: rgba(15, 23, 42, 0.8);
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 18px;
+
+  padding: 24px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.search-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  font-weight: 600;
+}
+
+.search-form input {
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: 10px;
+
+  border: 1px solid #334155;
+
+  background: #1e293b;
+
+  color: white;
+
+  font-size: 1rem;
+}
+
+.search-form input::placeholder {
+  color: #64748b;
+}
+
+.search-form input:focus {
+  outline: none;
+
+  border-color: #3b82f6;
+
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* ======================
+   Country List
+====================== */
+
+.country-list {
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.country-list li {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  background: rgba(15, 23, 42, 0.8);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  transition: all 0.2s ease;
+}
+
+.country-list li:hover {
+  transform: translateY(-2px);
+
+  border-color: #3b82f6;
+}
+
+/* ======================
+   Buttons
+====================== */
+
+.show-btn {
+  border: none;
+
+  padding: 10px 16px;
+
+  border-radius: 10px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.show-btn:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-2px);
+}
+
+/* ======================
+   Country Layout
+====================== */
+
+.country-layout {
+  display: grid;
+
+  grid-template-columns: 2fr 1fr;
+
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .country-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ======================
+   Cards
+====================== */
+
+.country-card,
+.weather-card {
+  background: rgba(15, 23, 42, 0.8);
+
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 18px;
+
+  padding: 24px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.country-card h1 {
+  margin-bottom: 20px;
+}
+
+.country-card h2 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.weather-card h2 {
+  margin-bottom: 18px;
+}
+
+/* ======================
+   Country Details
+====================== */
+
+.country-info {
+  display: flex;
+  gap: 40px;
+
+  margin-bottom: 20px;
+}
+
+.country-info strong {
+  color: #93c5fd;
+}
+
+/* ======================
+   Languages
+====================== */
+
+.country-card ul {
+  margin-left: 20px;
+}
+
+.country-card li {
+  margin-bottom: 6px;
+}
+
+/* ======================
+   Flag
+====================== */
+
+.flag {
+  width: 100%;
+
+  margin-top: 20px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ======================
+   Weather
+====================== */
+
+.weather-card {
+  text-align: center;
+}
+
+.weather-card img {
+  width: 120px;
+}
+
+.weather-card p {
+  margin: 12px 0;
+}
+
+.weather-card strong {
+  color: #93c5fd;
+}
+
+/* ======================
+   Messages
+====================== */
+
+.info-message {
+  text-align: center;
+
+  padding: 20px;
+
+  background: rgba(15, 23, 42, 0.8);
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  color: #94a3b8;
+}
