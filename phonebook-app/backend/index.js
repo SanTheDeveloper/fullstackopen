@@ -26,8 +26,8 @@ let persons = [
   },
 ];
 
-app.use(express.static("dist"));
 app.use(express.json());
+app.use(express.static("dist"));
 
 morgan.token("body", (request, response) => {
   if (request.method === "POST") {
