@@ -1,2 +1,2 @@
 @baseUrl = http://localhost:3001
-GET {{baseUrl}}/api/persons/3
+GET {{baseUrl}}/api/persons/6a34fc9ed4c887c78bdcf9c7

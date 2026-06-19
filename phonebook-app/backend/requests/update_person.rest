@@ -1,0 +1,7 @@
+@baseUrl = http://localhost:3001
+PUT {{baseUrl}}/api/persons/6a34fc9ed4c887c78bdcf9c7
+Content-Type: application/json
+
+{
+  "number": "091-9376838" 
+}

@@ -1,2 +1,2 @@
 @baseUrl = http://localhost:3001
-DELETE {{baseUrl}}/api/persons/3
+DELETE {{baseUrl}}/api/persons/6a3522e507f61ed1f341c56a
