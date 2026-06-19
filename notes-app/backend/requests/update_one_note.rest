@@ -1,8 +1,7 @@
 @baseUrl = http://localhost:3001
-POST {{baseUrl}}/api/notes
+PUT {{baseUrl}}/api/notes/6a3498bca711c0c2db9dda53
 Content-Type: application/json
 
 {
-  "content": "Correct status code is working now",
   "important": false
 }

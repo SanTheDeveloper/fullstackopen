@@ -1,0 +1,2 @@
+@baseUrl = http://localhost:3001
+DELETE {{baseUrl}}/api/notes/6a350ea3442d6696224b430c
