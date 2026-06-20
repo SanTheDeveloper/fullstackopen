@@ -78,12 +78,18 @@ const App = () => {
       number: trimmedNumber,
     };
 
-    personService.create(newPerson).then((returnedPerson) => {
-      showNotification(`Added ${trimmedName}`, "success");
-      setPersons((prevPersons) => [...prevPersons, returnedPerson]);
-      setNewName("");
-      setNewNumber("");
-    });
+    personService
+      .create(newPerson)
+      .then((returnedPerson) => {
+        showNotification(`Added ${trimmedName}`, "success");
+        setPersons((prevPersons) => [...prevPersons, returnedPerson]);
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        // console.log(error.response.data.error);
+        showNotification(`${error.response.data.error}`, "error");
+      });
   };
 
   const handlePersonChange = (event) => {

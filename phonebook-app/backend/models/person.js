@@ -16,8 +16,23 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: [3, "Name must be at least 3 characters long"],
+    required: [true, "Person name is required"],
+  },
+  number: {
+    type: String,
+    minLength: [8, "Phone number must have a length of 8 or more characters"],
+    required: [true, "Phone number is required"],
+    validate: {
+      validator: function (value) {
+        return /^\d{2,3}-\d+$/.test(value);
+      },
+      message: (props) =>
+        `${props.value} is not a valid phone number format! Try xx-xxxxxxx or xxx-xxxxxxx.`,
+    },
+  },
 });
 
 personSchema.set("toJSON", {
