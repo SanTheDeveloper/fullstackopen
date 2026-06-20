@@ -1,6 +1,6 @@
 # ⚙️ Phonebook Backend API
 
-_Full Stack Open - Part 3 (Exercises 3.1 - 3.18)_
+_Full Stack Open - Part 3 (Exercises 3.1 - 3.22)_
 
 ## 🎯 Objective
 
@@ -8,18 +8,19 @@ A RESTful API built with Node.js and Express to handle backend operations for th
 
 ## 🧠 Architecture & Key Features
 
-- **MongoDB Integration:** Utilizes the Mongoose ODM to define strict data schemas, manage database connections securely via environment variables, and execute highly optimized queries (e.g., `countDocuments`).
+- **MongoDB Integration & Validation:** Utilizes the Mongoose ODM to define strict data schemas. Implements schema-level validation (e.g., `required`, `minLength`, and custom Regex pattern matching for phone numbers) to ensure data integrity.
 - **RESTful Routing:** Fully implements standard CRUD endpoints mapped directly to MongoDB queries:
   - `GET /api/persons`: Fetch all contacts.
-  - `GET /api/persons/:id`: Fetch a single contact, handling 404s if missing.
+  - `GET /api/persons/:id`: Fetch a single contact.
   - `POST /api/persons`: Create a new contact.
   - `PUT /api/persons/:id`: Update an existing contact's information.
   - `DELETE /api/persons/:id`: Remove a contact permanently.
 - **Strict Middleware Pipeline:**
   - **Body Parsing:** Utilizes `express.json()` to parse incoming HTTP request bodies.
-  - **Custom Logging:** Configured `morgan` middleware with a custom token to log HTTP request details and stringified `POST` payloads.
-  - **Fallback Routing:** Configured an `unknownEndpoint` middleware to catch unrecognized URLs and prevent hanging requests.
-  - **Centralized Error Handling:** Placed at the very end of the pipeline. It catches rejected Promises (e.g., Mongoose `CastError` exceptions for malformed IDs) and formats standardized HTTP error responses, keeping route handlers clean.
+  - **Custom Logging:** Configured `morgan` middleware to log HTTP request details and stringified `POST` payloads.
+  - **Fallback Routing:** Configured an `unknownEndpoint` middleware to catch unrecognized URLs.
+  - **Centralized Error Handling:** Placed at the very end of the pipeline. Catches rejected Promises (Mongoose `CastError`) and validation errors (`ValidationError`), formatting standardized HTTP responses to keep route handlers clean.
+- **Static Analysis:** Configured ESLint with `@stylistic/js` plugins to enforce strict code quality, consistent Unix linebreaks, and prevent Javascript anti-patterns.
 - **Full-Stack Integration:** Configured Express middleware (`express.static`) to serve the compiled React frontend `dist` directory seamlessly.
 - **Production Deployment:** Configured dynamic port binding (`process.env.PORT`) to support deployment to modern PaaS providers.
 
@@ -27,8 +28,8 @@ A RESTful API built with Node.js and Express to handle backend operations for th
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
-- **Database:** MongoDB Atlas
-- **ODM:** Mongoose
+- **Database:** MongoDB Atlas & Mongoose (ODM)
+- **Static Analysis:** ESLint
 - **Tools:** Morgan (Logging), dotenv (Environment Management)
 
 ## 🛠️ How to Run Locally
@@ -40,8 +41,11 @@ A RESTful API built with Node.js and Express to handle backend operations for th
 2. Install dependencies:
    npm install
 
-3. Start the development server (with hot-reloading):
+3. Run the linter to verify code quality:
+   npm run lint
+
+4. Start the development server (with hot-reloading):
    npm run dev
 
-4. The server will be accessible at:
+5. The server will be accessible at:
    http://localhost:3001
