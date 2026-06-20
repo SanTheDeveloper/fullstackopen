@@ -3,6 +3,6 @@ POST {{baseUrl}}/api/notes
 Content-Type: application/json
 
 {
-  "content": "Correct status code is working now",
-  "important": false
+  "content": "lol",
+  "important": true
 }
