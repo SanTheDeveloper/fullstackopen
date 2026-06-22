@@ -7,7 +7,7 @@ This directory contains the complete, full-stack Notes application built through
 This application follows a strict decoupling of the client and server:
 
 - **/frontend:** A React single-page application (SPA) built with Vite. It handles all user interface rendering, local state management, and HTTP communication via Axios.
-- **/backend:** A Node.js and Express RESTful API. It provides the endpoints for CRUD operations and handles data persistence.
+- **/backend:** A Node.js and Express RESTful API. It utilizes a modular controller architecture, provides endpoints for CRUD operations, and handles robust data persistence via **MongoDB Atlas**.
 
 ## 🚀 Quick Start
 
