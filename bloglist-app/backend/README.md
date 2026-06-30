@@ -1,13 +1,15 @@
 # 📚 Blog List - Backend API
 
-This is the Express.js REST API for the Blog List application. It utilizes a modular, enterprise-ready architecture to handle routing, middleware processing, data persistence using MongoDB Atlas, and automated unit testing.
+This is the Express.js REST API for the Blog List application. It utilizes a modular, enterprise-ready architecture to handle routing, middleware processing, data persistence using MongoDB Atlas, and full-scale automated testing.
 
 ## 🧠 Architectural Concepts & Features
 
-- **Automated Testing:** Implements the native `node:test` runner and `node:assert` module to execute structured unit tests (`describe` and `test` blocks) against core business logic and array manipulation helpers.
-- **Separation of Concerns:** The core application logic (`app.js`) is decoupled from the network server listener (`index.js`). This isolates the API for efficient, headless integration testing.
+- **Automated Integration Testing:** Utilizes `supertest` and the native `node:test` runner to execute headless, end-to-end HTTP integration tests against a dedicated test database. Tests verify API routing, HTTP status codes, and JSON payload structures.
+- **Environment Management:** Dynamically switches between `development`, `test`, and `production` database URIs and logging behaviors based on the `NODE_ENV` variable.
+- **Asynchronous Optimization:** All route controllers are built using ES7 `async/await` syntax. Leverages Express 5's automatic error propagation to route rejected promises directly to the error-handling middleware.
+- **Separation of Concerns:** The core application logic (`app.js`) is decoupled from the network server listener (`index.js`). This isolates the API for efficient integration testing.
 - **Modular Routing:** Endpoints are extracted into dedicated controller modules (`controllers/blogs.js`) using Express Router, maintaining a clean and readable root application.
-- **MongoDB Integration:** Utilizes the Mongoose ODM to define data schemas and format outgoing JSON payloads (mapping `_id` to `id` and stripping `__v`). Includes a standalone `mongo.js` seeder script to populate local development databases.
+- **MongoDB Integration & Validation:** Utilizes the Mongoose ODM to define strict data schemas (e.g., `required` fields, `default` values) and format outgoing JSON payloads (mapping `_id` to `id` and stripping `__v`). Includes a standalone `mongo.js` seeder script to populate local development databases.
 - **Strict Middleware Pipeline:**
   - **CORS & Body Parsing:** Natively handles cross-origin requests and parses incoming JSON payloads.
   - **Custom Logging:** Extracted to `utils/logger.js` for centralized console management.
@@ -18,7 +20,7 @@ This is the Express.js REST API for the Blog List application. It utilizes a mod
 
 ├── controllers/ # Route handlers (Express Router)
 ├── models/ # Mongoose database schemas
-├── tests/ # Automated unit and integration tests
+├── tests/ # Automated unit and API integration tests
 ├── utils/ # Helper modules (logger, config, middleware)
 ├── app.js # Express application configuration
 ├── index.js # Network listener (Server entry point)
@@ -26,16 +28,17 @@ This is the Express.js REST API for the Blog List application. It utilizes a mod
 
 ## 🚀 Tech Stack
 
-- Node.js & Express.js
+- Node.js & Express.js (v5)
 - MongoDB Atlas & Mongoose
-- ESLint (Static Analysis)
-- node:test (Testing Framework)
-- dotenv (Environment Management)
+- Testing: node:test, supertest
+- Static Analysis: ESLint
+- Environment Management: dotenv
 
 ## 🛠️ How to Run Locally
 
-1. Create a `.env` file in the root directory:
+1. Create a `.env` file in the root directory (ensure you have separate databases for dev and test):
    MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../bloglistApp
+   TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testBloglistApp
    PORT=3003
 
 2. Install dependencies:
