@@ -8,7 +8,7 @@ This is the Express.js REST API for the Blog List application. It utilizes a mod
 - **Environment Management:** Dynamically switches between `development`, `test`, and `production` database URIs and logging behaviors based on the `NODE_ENV` variable.
 - **Asynchronous Optimization:** All route controllers are built using ES7 `async/await` syntax. Leverages Express 5's automatic error propagation to route rejected promises directly to the error-handling middleware.
 - **Separation of Concerns:** The core application logic (`app.js`) is decoupled from the network server listener (`index.js`). This isolates the API for efficient integration testing.
-- **Modular Routing:** Endpoints are extracted into dedicated controller modules (`controllers/blogs.js`) using Express Router, maintaining a clean and readable root application.
+- **Modular Routing & Full CRUD:** Endpoints are extracted into dedicated controller modules (`controllers/blogs.js`) using Express Router, providing complete CRUD functionality (GET, POST, PUT, DELETE) while maintaining a clean and readable root application.
 - **MongoDB Integration & Validation:** Utilizes the Mongoose ODM to define strict data schemas (e.g., `required` fields, `default` values) and format outgoing JSON payloads (mapping `_id` to `id` and stripping `__v`). Includes a standalone `mongo.js` seeder script to populate local development databases.
 - **Strict Middleware Pipeline:**
   - **CORS & Body Parsing:** Natively handles cross-origin requests and parses incoming JSON payloads.
