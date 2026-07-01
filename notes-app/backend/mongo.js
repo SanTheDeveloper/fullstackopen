@@ -11,8 +11,7 @@ const url =
   "mongodb+srv://sandeep:p8ZHDsBd6uKJwk@cluster0.dpxnjwx.mongodb.net/testNoteApp?appName=Cluster0";
 
 mongoose.set("strictQuery", false);
-
-mongoose.connect(url, { family: 4 });
+mongoose.connect(url);
 
 const noteSchema = new mongoose.Schema({
   content: String,
@@ -21,19 +20,19 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model("Note", noteSchema);
 
-const note = new Note({
-  content: "HTML is easy",
-  important: false,
-});
+// const note = new Note({
+//   content: 'HTML is easy',
+//   important: true,
+// })
 
-note.save().then(() => {
-  console.log("note saved!");
+// // note.save().then((result) => {
+// //   console.log('note saved!')
+// //   mongoose.connection.close()
+// // })
+
+Note.find({}).then((result) => {
+  result.forEach((note) => {
+    console.log(note);
+  });
   mongoose.connection.close();
 });
-
-// Note.find({ important: true }).then((result) => {
-//   result.forEach((note) => {
-//     console.log(note);
-//   });
-//   mongoose.connection.close();
-// });
