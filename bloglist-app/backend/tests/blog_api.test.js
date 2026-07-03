@@ -2,16 +2,50 @@ const assert = require("node:assert");
 const { test, beforeEach, after, describe } = require("node:test");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const bcrypt = require("bcrypt");
+
 const app = require("../app");
 const helper = require("./test_helper");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 const api = supertest(app);
+
+let token;
 
 describe("when there are initially some blogs saved", () => {
   beforeEach(async () => {
     await Blog.deleteMany({});
-    await Blog.insertMany(helper.initialBlogs);
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash("hellas12345", 10);
+
+    const user = new User({
+      username: "hellas",
+      name: "Arto Hellas",
+      passwordHash,
+    });
+
+    const savedUser = await user.save();
+
+    for (const blog of helper.initialBlogs) {
+      const newBlog = new Blog({
+        ...blog,
+        user: savedUser._id,
+      });
+
+      const savedBlog = await newBlog.save();
+      savedUser.blogs.push(savedBlog._id);
+    }
+
+    await savedUser.save();
+
+    const loginResponse = await api.post("/api/login").send({
+      username: "hellas",
+      password: "hellas12345",
+    });
+
+    token = loginResponse.body.token;
   });
 
   test("blogs are returned as json", async () => {
@@ -47,6 +81,7 @@ describe("when there are initially some blogs saved", () => {
 
       await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/);
@@ -68,6 +103,7 @@ describe("when there are initially some blogs saved", () => {
 
       const response = await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/);
@@ -82,7 +118,11 @@ describe("when there are initially some blogs saved", () => {
         likes: 0,
       };
 
-      await api.post("/api/blogs").send(newBlog).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400);
 
       const blogsAtEnd = await helper.blogsInDb();
 
@@ -96,11 +136,32 @@ describe("when there are initially some blogs saved", () => {
         likes: 0,
       };
 
-      await api.post("/api/blogs").send(newBlog).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400);
 
       const blogsAtEnd = await helper.blogsInDb();
 
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+    });
+
+    test("fails with status code 401 if token is not provided", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const newBlog = {
+        title: "Unauthorized blog",
+        author: "Anonymous",
+        url: "https://example.com",
+        likes: 1,
+      };
+
+      await api.post("/api/blogs").send(newBlog).expect(401);
+
+      const blogsAtEnd = await helper.blogsInDb();
+
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
     });
   });
 
@@ -109,7 +170,10 @@ describe("when there are initially some blogs saved", () => {
       const blogsAtStart = await helper.blogsInDb();
       const blogToDelete = blogsAtStart[0];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(204);
 
       const blogsAtEnd = await helper.blogsInDb();
 
