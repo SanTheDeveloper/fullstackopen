@@ -67,7 +67,7 @@ const App = () => {
   const handleCreateBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(newBlog));
+      setBlogs((blogs) => blogs.concat(newBlog));
     } catch (error) {
       showNotification("Failed to create blog post", "error");
       console.error(error.message);
