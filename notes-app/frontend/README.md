@@ -92,6 +92,54 @@ The frontend handles failed asynchronous operations through error handling and d
 
 Notifications provide visual feedback for unsuccessful operations while the application updates its local state after successful server operations.
 
+### 🧪 Component Testing
+
+The frontend uses Vitest and React Testing Library to test React components in a simulated browser environment.
+
+The testing stack includes:
+
+- **Vitest** — test runner and assertion library
+- **jsdom** — simulated browser DOM environment
+- **React Testing Library** — renders React components and provides UI queries
+- **jest-dom** — provides expressive DOM assertions
+- **user-event** — simulates user interactions such as typing and clicking
+
+Current component tests cover:
+
+- Rendering note content
+- Note button interaction
+- `Togglable` initial visibility
+- Showing and hiding `Togglable` content
+- Note form input and submission
+- Callback invocation and submitted data
+
+Test files are colocated with the components they test.
+
+### 🔎 Testing Patterns
+
+The tests use:
+
+- `render()` to render components in the test environment
+- `screen` queries such as `getByText`, `getByRole`, `getByLabelText`, and `getByPlaceholderText`
+- `getBy*`, `queryBy*`, and `findBy*` according to whether an element should exist, may be absent, or should appear asynchronously
+- `userEvent.setup()` and asynchronous user interactions
+- `vi.fn()` mock functions to record callback calls and arguments
+- `beforeEach()` for fresh component setup
+- `screen.debug()` for debugging rendered output
+- `toBeVisible()`, `toHaveTextContent()`, and other DOM assertions
+
+The tests prioritize user-visible behavior over implementation details such as CSS selectors.
+
+### 📊 Test Coverage
+
+Vitest can generate a coverage report for the frontend:
+
+```bash
+npm test -- --coverage
+````
+
+The generated report is stored in the `coverage/` directory, which is excluded from version control.
+
 ### 🧹 Code Quality
 
 ESLint is configured to maintain a consistent JavaScript and JSX coding style.
@@ -108,6 +156,8 @@ The project currently uses:
 * No trailing whitespace
 * Console statements permitted during development
 
+````
+
 ## 📁 Frontend Structure
 
 ```text
@@ -116,9 +166,12 @@ src/
 │   ├── Footer.jsx
 │   ├── LoginForm.jsx
 │   ├── Note.jsx
+│   ├── Note.test.jsx
 │   ├── NoteForm.jsx
+│   ├── NoteForm.test.jsx
 │   ├── Notification.jsx
-│   └── Togglable.jsx
+│   ├── Togglable.jsx
+│   └── Togglable.test.jsx
 │
 ├── services/
 │   ├── login.js
@@ -127,14 +180,22 @@ src/
 ├── App.jsx
 ├── index.css
 └── main.jsx
+
+testSetup.js
+vite.config.js
 ```
 
 ## 🚀 Tech Stack
 
-* React 19
-* Vite
-* Axios
-* ESLint
+- React 19
+- Vite
+- Axios
+- Vitest
+- jsdom
+- React Testing Library
+- jest-dom
+- user-event
+- ESLint
 
 ## 🛠️ How to Run Locally
 
@@ -142,7 +203,7 @@ src/
 
 ```bash
 npm install
-```
+````
 
 ### 2. Ensure the Notes App Backend is running
 
@@ -152,6 +213,20 @@ The backend runs on port `3001`.
 
 ```bash
 npm run dev
+```
+
+## 🧪 Testing
+
+Run the complete frontend test suite:
+
+```bash
+npm test
+```
+
+Run the tests with coverage:
+
+```bash
+npm test -- --coverage
 ```
 
 ## 🧹 Linting

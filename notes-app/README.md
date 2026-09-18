@@ -28,6 +28,14 @@ Current concepts include:
 - Persistent login sessions using `localStorage`
 - Axios-based server communication
 - Separation of UI components and service modules
+- Component testing with Vitest
+- Simulated browser environments with `jsdom`
+- React component rendering and querying with React Testing Library
+- DOM assertions with `jest-dom`
+- User interaction testing with `user-event`
+- Mock functions with `vi.fn()`
+- Test setup and cleanup
+- Test coverage
 - ESLint configuration and code-quality enforcement
 
 ## 🔐 Authentication & Session Management
@@ -73,10 +81,15 @@ For detailed implementation information, see:
 
 ### Frontend
 
-* React 19
-* Vite
-* Axios
-* ESLint
+- React 19
+- Vite
+- Axios
+- Vitest
+- jsdom
+- React Testing Library
+- jest-dom
+- user-event
+- ESLint
 
 ### Backend
 
@@ -91,6 +104,36 @@ For detailed implementation information, see:
 * ESLint
 * dotenv
 * cross-env
+
+## 🧪 Frontend Testing
+
+The frontend uses Vitest and React Testing Library for component-level testing.
+
+Current tests cover:
+
+- Rendering note content
+- Note importance button interaction
+- `Togglable` visibility behavior
+- Showing and hiding togglable content
+- Note form submission
+- User text input
+- Callback invocation and arguments
+
+Tests are located alongside the components they test.
+
+Run the test suite with:
+
+```bash
+npm test
+````
+
+Generate a test coverage report with:
+
+```bash
+npm test -- --coverage
+```
+
+Coverage reports are generated in the `coverage/` directory and are excluded from version control.
 
 ## 🚀 Quick Start
 
