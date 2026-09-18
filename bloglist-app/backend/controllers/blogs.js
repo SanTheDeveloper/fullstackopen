@@ -4,6 +4,7 @@ const middleware = require("../utils/middleware");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+
   return response.json(blogs);
 });
 
@@ -20,6 +21,7 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   });
 
   const savedBlog = await blog.save();
+
   user.blogs.push(savedBlog._id);
   await user.save();
 
@@ -31,8 +33,8 @@ blogsRouter.delete(
   middleware.userExtractor,
   async (request, response) => {
     const user = request.user;
-
     const blog = await Blog.findById(request.params.id);
+
     if (!blog) {
       return response.status(404).json({ error: "blog not found" });
     }
@@ -53,9 +55,10 @@ blogsRouter.delete(
 );
 
 blogsRouter.put("/:id", async (request, response) => {
-  const { title, author, url, likes } = request.body;
+  const { title, author, url, likes, user } = request.body;
 
   const blog = await Blog.findById(request.params.id);
+
   if (!blog) {
     return response.status(404).end();
   }
@@ -64,8 +67,15 @@ blogsRouter.put("/:id", async (request, response) => {
   blog.author = author;
   blog.url = url;
   blog.likes = likes;
+  blog.user = user;
 
   const updatedBlog = await blog.save();
+
+  await updatedBlog.populate("user", {
+    username: 1,
+    name: 1,
+  });
+
   response.json(updatedBlog);
 });
 
