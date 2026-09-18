@@ -1,52 +1,189 @@
 # ⚙️ Notes App - Backend API
 
-This is the Express.js REST API that powers the Notes application. It utilizes a modular, enterprise-ready architecture to handle routing, strict middleware processing, data validation, and persistence using MongoDB Atlas.
+This is the Express.js REST API that powers the Notes application. It provides the backend services required by the React frontend, including user management, JWT authentication, note CRUD operations, middleware processing, MongoDB persistence, and automated testing.
 
 ## 🧠 Architectural Concepts & Features
 
-- **User Administration & Security:** Manages user creation and session persistence. Utilizes `bcrypt` for secure password hashing and `jsonwebtoken` (JWT) for stateless, token-based authentication. Endpoints are protected via HTTP `Authorization: Bearer <token>` headers, ensuring only authenticated users can modify database records.
-- **Relational Data Mapping:** Simulates relational `JOIN` queries in a NoSQL environment using Mongoose document references and the `.populate()` method. Notes are intrinsically linked to their creators, allowing seamless cross-collection queries.
-- **Integration Testing & Environments:** Configured `cross-env` to dynamically switch between `development`, `test`, and `production` modes. Utilizes `supertest` and `node:test` to execute headless, end-to-end HTTP integration tests against a dedicated test database.
-- **Asynchronous Optimization:** All route controllers are refactored using ES7 `async/await` syntax, eliminating callback hell and utilizing Express 5's automatic error propagation to middleware.
-- **Separation of Concerns:** The application logic (`app.js`) is decoupled from the network server execution (`index.js`), enabling headless API testing and cleaner module management.
-- **Modular Routing:** Endpoints are grouped into dedicated controller modules (`controllers/notes.js`, `controllers/users.js`, `controllers/login.js`) using Express Router, keeping the main application file clean.
-- **Strict Middleware Pipeline:**
-  - **Body Parsing:** Utilizes `express.json()` to natively parse HTTP request bodies.
-  - **Custom Logging:** Extracted to `utils/logger.js` for centralized console management.
-  - **Fallback Routing:** `unknownEndpoint` catches unrecognized URLs.
-  - **Centralized Error Handling:** Catches Mongoose `CastError`, `ValidationError`, and `MongoServerError` (duplicate keys). Also intercepts JWT errors (`JsonWebTokenError`, `TokenExpiredError`), formatting standardized HTTP 400/401 error responses.
+### 🔐 User Administration & Authentication
+
+- Manages user creation and authentication.
+- Hashes passwords securely using `bcrypt`.
+- Uses `jsonwebtoken` (JWT) for stateless token-based authentication.
+- Protects authenticated operations through HTTP `Authorization: Bearer <token>` headers.
+- Identifies the authenticated user through custom authentication middleware.
+
+### 🔗 User-Note Relationships
+
+Notes are associated with their creators through Mongoose ObjectId references.
+
+Mongoose `populate()` is used when related user information needs to be resolved across collections.
+
+### 🧩 Modular Routing
+
+API functionality is separated into dedicated controller modules:
+
+```text
+controllers/
+├── notes.js
+├── users.js
+└── login.js
+````
+
+Express Router is used to keep route definitions modular and maintain a clean root application.
+
+### 🔄 RESTful API
+
+The backend provides RESTful operations for note and user resources.
+
+The Notes API supports:
+
+* Retrieving notes
+* Creating notes
+* Updating note importance
+* Deleting notes
+
+Authenticated requests are protected through the custom authentication middleware.
+
+### 🧪 Automated Testing
+
+The backend uses:
+
+* `node:test`
+* `supertest`
+
+The test environment uses a dedicated MongoDB database.
+
+Tests cover API behavior, response status codes, authentication, validation, and application functionality.
+
+### 🌍 Environment Management
+
+The application supports separate development, test, and production environments.
+
+`cross-env` and environment variables are used to select the appropriate runtime configuration and MongoDB connection settings.
+
+### ⚡ Async/Await & Express 5
+
+Route controllers use `async/await` syntax.
+
+The application takes advantage of Express 5's automatic propagation of rejected promises to the centralized error-handling middleware.
+
+### 🧱 Separation of Concerns
+
+The Express application configuration is separated from the network listener:
+
+```text
+app.js    → application configuration
+index.js  → server startup
+```
+
+This allows the application to be imported independently for testing.
+
+## 🛡️ Middleware Pipeline
+
+The backend uses middleware for:
+
+* JSON request body parsing
+* Authentication
+* Request logging
+* Unknown endpoint handling
+* Centralized error handling
+
+Custom middleware includes:
+
+* Token extraction
+* User extraction
+* Request logging
+* Unknown endpoint handling
+* Centralized error handling
+
+### 🚨 Centralized Error Handling
+
+The backend handles common application and database errors including:
+
+* `CastError`
+* `ValidationError`
+* `MongoServerError` duplicate-key errors
+* `JsonWebTokenError`
+* `TokenExpiredError`
+
+Errors are converted into standardized HTTP responses.
 
 ## 📁 Directory Structure
 
-├── controllers/ # Route handlers (Express Router)
-├── models/ # Mongoose database schemas (Note, User)
-├── tests/ # Automated integration and unit tests
-├── utils/ # Helper modules (logger, config, middleware, test helpers)
-├── app.js # Express application configuration
-└── index.js # Network listener (Server entry point)
+```text
+backend/
+├── controllers/
+│   ├── login.js
+│   ├── notes.js
+│   └── users.js
+│
+├── models/
+│   ├── note.js
+│   └── user.js
+│
+├── tests/
+│   └── ...
+│
+├── utils/
+│   ├── config.js
+│   ├── logger.js
+│   ├── middleware.js
+│   └── ...
+│
+├── app.js
+├── index.js
+└── mongo.js
+```
 
 ## 🚀 Tech Stack
 
-- Node.js & Express.js (v5)
-- MongoDB Atlas & Mongoose (ODM)
-- Security: bcrypt, jsonwebtoken
-- Testing: node:test, supertest
-- Static Analysis: ESLint
-- Tools: cross-env, dotenv
+* Node.js
+* Express.js 5
+* MongoDB Atlas
+* Mongoose
+* bcrypt
+* jsonwebtoken
+* node:test
+* supertest
+* ESLint
+* cross-env
+* dotenv
 
 ## 🛠️ How to Run Locally
 
-1. Create a `.env` file in the root directory. _Ensure you define a secure cryptographic SECRET._
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../noteApp
-   TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testNoteApp
-   SECRET=your_super_secret_cryptographic_key
-   PORT=3001
+### 1. Configure environment variables
 
-2. Install dependencies:
-   npm install
+Create a `.env` file in the backend root:
 
-3. Execute the automated test suite:
-   npm run test
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../noteApp
+TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testNoteApp
+SECRET=your_super_secret_cryptographic_key
+PORT=3001
+```
 
-4. Start the development server (with hot-reloading):
-   npm run dev
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the automated test suite
+
+```bash
+npm run test
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+### 5. Seed the database
+
+Use the database utility when sample data needs to be created:
+
+```bash
+node mongo.js
+```
