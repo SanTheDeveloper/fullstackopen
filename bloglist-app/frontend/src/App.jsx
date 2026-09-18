@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -12,6 +13,8 @@ const App = () => {
 
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationType, setNotificationType] = useState("success");
+
+  const blogFormRef = useRef();
 
   const showNotification = (message, type = "success") => {
     setNotificationMessage(message);
@@ -68,10 +71,23 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blogObject);
       setBlogs((blogs) => blogs.concat(newBlog));
+      blogFormRef.current.toggleVisibility();
     } catch (error) {
       showNotification("Failed to create blog post", "error");
       console.error(error.message);
     }
+  };
+
+  const handleUpdateBlog = (updatedBlogObj) => {
+    const updatedBlogs = blogs.map((blog) =>
+      blog.id === updatedBlogObj.id ? updatedBlogObj : blog,
+    );
+
+    setBlogs(updatedBlogs);
+  };
+
+  const handleRemoveBlog = (id) => {
+    setBlogs((blogs) => blogs.filter((blog) => blog.id !== id));
   };
 
   if (user === null) {
@@ -94,11 +110,22 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
       </p>
 
-      <BlogForm createBlog={handleCreateBlog} />
+      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+        <BlogForm createBlog={handleCreateBlog} />
+      </Togglable>
 
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      {blogs
+        .toSorted((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            updateBlog={handleUpdateBlog}
+            showNotification={showNotification}
+            user={user}
+            removeBlog={handleRemoveBlog}
+          />
+        ))}
     </div>
   );
 };
