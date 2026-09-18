@@ -1,60 +1,223 @@
 # 📚 Blog List - Backend API
 
-This is the Express.js REST API for the Blog List application. It utilizes a modular, enterprise-ready architecture to handle routing, middleware processing, data persistence using MongoDB Atlas, and full-scale automated testing.
+This is the Express.js REST API for the Blog List application. It provides the backend services required by the React frontend, including user management, JWT authentication, blog CRUD operations, authorization, MongoDB persistence, and automated testing.
 
 ## 🧠 Architectural Concepts & Features
 
-- **Authentication & Security:** Manages user creation and session persistence. Utilizes `bcrypt` for secure password hashing and `jsonwebtoken` (JWT) for stateless, token-based authentication. Endpoints are protected via HTTP `Authorization: Bearer <token>` headers, ensuring only authorized creators can modify or delete their respective database records.
-- **Relational Data Mapping:** Simulates relational `JOIN` queries in a NoSQL environment using Mongoose document references and the `.populate()` method. Blogs are intrinsically linked to their creators, allowing seamless cross-collection queries.
-- **Automated Integration Testing:** Utilizes `supertest` and the native `node:test` runner to execute headless, end-to-end HTTP integration tests against a dedicated test database. Tests verify API routing, HTTP status codes, JSON payload structures, and protected route authorization constraints (`401 Unauthorized`).
-- **Environment Management:** Dynamically switches between `development`, `test`, and `production` database URIs and logging behaviors based on the `NODE_ENV` variable.
-- **Asynchronous Optimization:** All route controllers are built using ES7 `async/await` syntax. Leverages Express 5's automatic error propagation to route rejected promises directly to the error-handling middleware.
-- **Modular Routing & Full CRUD:** Endpoints are extracted into dedicated controller modules (`controllers/blogs.js`, `controllers/users.js`, `controllers/login.js`) using Express Router, providing complete CRUD functionality while maintaining a clean and readable root application.
-- **MongoDB Integration & Validation:** Utilizes the Mongoose ODM to define strict data schemas (e.g., `required` fields, `default` values, `unique` constraints). Includes a standalone `mongo.js` seeder script to populate local development databases.
+### 🔐 Authentication & Authorization
 
-## 🛡️ Strict Middleware Pipeline
+- Creates and manages users.
+- Hashes passwords securely using `bcrypt`.
+- Uses `jsonwebtoken` for stateless JWT authentication.
+- Extracts and verifies bearer tokens through custom middleware.
+- Associates newly created blogs with the authenticated user.
+- Protects blog deletion so that only the creator can delete their blog.
 
-- **CORS & Body Parsing:** Natively handles cross-origin requests and parses incoming JSON payloads.
-- **Authentication Extractors:** Custom `tokenExtractor` and `userExtractor` securely parse HTTP headers and verify JWT signatures to identify users for protected routes.
-- **Custom Logging:** Extracted to `utils/logger.js` for centralized console management.
-- **Fallback Routing:** Configures an `unknownEndpoint` middleware to gracefully handle unrecognized URLs.
-- **Centralized Error Handling:** Catches Mongoose `CastError`, `ValidationError`, `MongoServerError` (duplicate keys), and JWT errors (`JsonWebTokenError`, `TokenExpiredError`), outputting standardized HTTP error responses to keep route controllers clean.
+Protected requests use:
+
+```text
+Authorization: Bearer <token>
+```
+
+### 🔗 User-Blog Relationships
+
+Blogs store a reference to the user who created them using a MongoDB ObjectId.
+
+Mongoose `populate()` is used to resolve the referenced user when returning blog data.
+
+For example:
+
+```js
+Blog.find({}).populate("user", {
+  username: 1,
+  name: 1,
+});
+```
+
+The `PUT` operation also populates the user information before returning the updated blog to the frontend.
+
+### 🧩 Modular Routing
+
+The API is divided into dedicated controller modules:
+
+```text
+controllers/
+├── blogs.js
+├── users.js
+└── login.js
+```
+
+Each controller contains its related Express Router definitions.
+
+### 🔄 Blog CRUD Operations
+
+The backend provides:
+
+- `GET /api/blogs`
+- `POST /api/blogs`
+- `PUT /api/blogs/:id`
+- `DELETE /api/blogs/:id`
+
+Blog creation requires authentication.
+
+Blog deletion requires authentication and verifies that the authenticated user is the creator of the blog.
+
+The `PUT` endpoint is used by the frontend for blog updates such as increasing likes and returns the updated blog with its populated user information.
+
+### 🧪 Automated Testing
+
+The backend uses:
+
+- Native `node:test`
+- `supertest`
+
+The test suite includes:
+
+- Blog array calculation tests
+- API integration tests
+- HTTP status code verification
+- Response body validation
+- User administration tests
+- Authentication and authorization checks
+- CRUD endpoint testing
+- Database cleanup and test data initialization
+
+The tests run against a dedicated test database.
+
+### 🗄️ MongoDB & Mongoose
+
+MongoDB Atlas is used for persistent application data.
+
+Mongoose provides:
+
+- Schema definitions
+- Validation
+- Default values
+- Unique constraints
+- ObjectId references
+- Document population
+
+The database contains related `User` and `Blog` documents connected through Mongoose references.
+
+### ⚙️ Environment Management
+
+Environment variables are used to configure:
+
+- Development MongoDB URI
+- Test MongoDB URI
+- JWT secret
+- Server port
+
+Sensitive configuration is stored in `.env`.
+
+### 🚨 Error Handling
+
+The backend contains centralized handling for common application and database errors, including:
+
+- `CastError`
+- `ValidationError`
+- MongoDB duplicate-key errors
+- `JsonWebTokenError`
+- `TokenExpiredError`
+
+Unknown routes are handled by a dedicated `unknownEndpoint` middleware.
+
+### 🪵 Logging
+
+Application logging is centralized through:
+
+```text
+utils/logger.js
+```
+
+This keeps logging behavior consistent across the application.
+
+## 🛡️ Middleware Pipeline
+
+The backend uses middleware for:
+
+- JSON body parsing
+- CORS handling
+- Token extraction
+- User extraction
+- Request logging
+- Unknown endpoint handling
+- Centralized error handling
+
+Authentication middleware identifies the currently authenticated user from the JWT and makes that user available to protected route handlers.
 
 ## 📁 Directory Structure
 
-├── controllers/ # Route handlers (Express Router)
-├── models/ # Mongoose database schemas
-├── tests/ # Automated unit and API integration tests
-├── utils/ # Helper modules (logger, config, middleware)
-├── app.js # Express application configuration
-├── index.js # Network listener (Server entry point)
-└── mongo.js # Database seeder/test script
+```text
+backend/
+├── controllers/
+│   ├── blogs.js
+│   ├── users.js
+│   └── login.js
+│
+├── models/
+│   ├── blog.js
+│   └── user.js
+│
+├── tests/
+│   └── ...
+│
+├── utils/
+│   ├── config.js
+│   ├── logger.js
+│   └── middleware.js
+│
+├── app.js
+├── index.js
+└── mongo.js
+```
 
 ## 🚀 Tech Stack
 
-- Node.js & Express.js (v5)
-- MongoDB Atlas & Mongoose
-- Security: bcrypt, jsonwebtoken
-- Testing: node:test, supertest
-- Static Analysis: ESLint
-- Environment Management: dotenv
+- Node.js
+- Express.js 5
+- MongoDB Atlas
+- Mongoose
+- bcrypt
+- jsonwebtoken
+- node:test
+- supertest
+- ESLint
+- dotenv
 
 ## 🛠️ How to Run Locally
 
-1. Create a `.env` file in the root directory (ensure you define a secure cryptographic SECRET):
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../bloglistApp
-   TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testBloglistApp
-   SECRET=your_super_secret_cryptographic_key
-   PORT=3003
+### 1. Configure environment variables
 
-2. Install dependencies:
-   npm install
+Create a `.env` file in the backend root:
 
-3. Execute the automated test suite:
-   npm run test
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../bloglistApp
+TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testBloglistApp
+SECRET=your_super_secret_cryptographic_key
+PORT=3003
+```
 
-4. (Optional) Seed the database with sample data:
-   node mongo.js
+### 2. Install dependencies
 
-5. Start the development server (with hot-reloading):
-   npm run dev
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+### 4. Run the automated test suite
+
+```bash
+npm run test
+```
+
+### 5. Seed the database
+
+```bash
+node mongo.js
+```
