@@ -23,7 +23,6 @@ const Blog = ({ blog, updateBlog, showNotification, user, removeBlog }) => {
 
     try {
       const updatedBlogObj = await blogService.update(blog.id, newObject);
-      console.log(updatedBlogObj);
       updateBlog(updatedBlogObj);
     } catch (error) {
       showNotification("Failed to update blog post", "error");

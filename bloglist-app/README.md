@@ -116,12 +116,33 @@ The frontend is configured to proxy `/api` requests to the backend.
 
 ## 🧪 Testing
 
-The backend includes automated tests using:
+The application includes automated tests for both the backend and frontend.
 
-* `node:test`
-* `supertest`
+### Backend
 
-Frontend testing is being developed separately as part of the Full Stack Open curriculum.
+Backend tests use:
+
+- `node:test`
+- `supertest`
+
+They cover API behavior and integration with the test database.
+
+### Frontend
+
+Frontend component tests use:
+
+- `Vitest`
+- `jsdom`
+- `React Testing Library`
+- `jest-dom`
+- `user-event`
+
+Current frontend tests cover:
+
+- `Blog` rendering behavior
+- showing and hiding blog details
+- like-button interactions
+- `BlogForm` submission and callback behavior
 
 ## 🛠️ Technology Stack
 

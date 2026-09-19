@@ -117,13 +117,58 @@ The project currently enforces:
 
 Console statements are permitted during development.
 
+### 🧪 Component Testing
+
+The frontend uses component-level tests to verify React component behavior and user interactions.
+
+Testing tools:
+
+- `Vitest` — test runner, assertions, and mocks
+- `jsdom` — simulated browser environment
+- `React Testing Library` — renders components and queries the UI
+- `jest-dom` — DOM-specific assertions
+- `user-event` — simulates realistic user interactions
+
+Current tests cover:
+
+- `Blog` component rendering
+- blog detail visibility
+- like-button interactions
+- `BlogForm` submission
+- callback invocation and arguments
+
+The tests focus on observable component behavior rather than implementation details.
+
+Typical testing flow:
+
+```text
+Render component
+→ find user-facing element
+→ perform user interaction
+→ assert visible result or callback behavior
+````
+
+Test files are colocated with their components:
+
+```text
+src/components/
+├── Blog.jsx
+├── Blog.test.jsx
+├── BlogForm.jsx
+└── BlogForm.test.jsx
+```
+
+The frontend test environment is configured through `vite.config.js` and `testSetup.js`.
+
 ## 🧱 Frontend Structure
 
 ```text
 src/
 ├── components/
 │   ├── Blog.jsx
+│   ├── Blog.test.jsx
 │   ├── BlogForm.jsx
+│   ├── BlogForm.test.jsx
 │   ├── LoginForm.jsx
 │   ├── Notification.jsx
 │   └── Togglable.jsx
@@ -134,6 +179,9 @@ src/
 │
 ├── App.jsx
 └── main.jsx
+
+testSetup.js
+vite.config.js
 ```
 
 ## 🚀 Tech Stack
@@ -141,6 +189,11 @@ src/
 - React 19
 - Vite
 - Axios
+- Vitest
+- jsdom
+- React Testing Library
+- jest-dom
+- user-event
 - ESLint
 
 ## 🛠️ How to Run Locally
@@ -177,4 +230,12 @@ Automatically fix supported lint issues with:
 
 ```bash
 npm run lint -- --fix
+```
+
+## 🧪 Testing
+
+Run the frontend tests with:
+
+```bash
+npm test
 ```
