@@ -1,6 +1,6 @@
 # ⚙️ Notes App - Backend API
 
-This is the Express.js REST API that powers the Notes application. It provides the backend services required by the React frontend, including user management, JWT authentication, note CRUD operations, middleware processing, MongoDB persistence, and automated testing.
+This is the Express.js REST API that powers the Notes application. It provides the backend services required by the React frontend, including user management, JWT authentication, note CRUD operations, middleware processing, MongoDB persistence, automated testing, and support for end-to-end test initialization.
 
 ## 🧠 Architectural Concepts & Features
 
@@ -26,8 +26,9 @@ API functionality is separated into dedicated controller modules:
 controllers/
 ├── notes.js
 ├── users.js
-└── login.js
-````
+├── login.js
+└── testing.js
+```
 
 Express Router is used to keep route definitions modular and maintain a clean root application.
 
@@ -37,10 +38,10 @@ The backend provides RESTful operations for note and user resources.
 
 The Notes API supports:
 
-* Retrieving notes
-* Creating notes
-* Updating note importance
-* Deleting notes
+- Retrieving notes
+- Creating notes
+- Updating note importance
+- Deleting notes
 
 Authenticated requests are protected through the custom authentication middleware.
 
@@ -48,8 +49,8 @@ Authenticated requests are protected through the custom authentication middlewar
 
 The backend uses:
 
-* `node:test`
-* `supertest`
+- `node:test`
+- `supertest`
 
 The test environment uses a dedicated MongoDB database.
 
@@ -60,6 +61,49 @@ Tests cover API behavior, response status codes, authentication, validation, and
 The application supports separate development, test, and production environments.
 
 `cross-env` and environment variables are used to select the appropriate runtime configuration and MongoDB connection settings.
+
+The backend can be started specifically in test mode with:
+
+```bash
+npm run start:test
+```
+
+This starts the server with:
+
+```text
+NODE_ENV=test
+```
+
+### 🌐 End-to-End Test Support
+
+The backend provides a test-only API endpoint for initializing the database used by the Playwright end-to-end test suite.
+
+The testing router is mounted only when the backend runs in test mode:
+
+```js
+if (process.env.NODE_ENV === "test") {
+  const testingRouter = require("./controllers/testing");
+  app.use("/api/testing", testingRouter);
+}
+```
+
+This makes the reset endpoint available only in the test environment.
+
+The endpoint:
+
+```text
+POST /api/testing/reset
+```
+
+clears the test database by removing all notes and users.
+
+The endpoint returns:
+
+```text
+204 No Content
+```
+
+The endpoint is used by the E2E test suite to establish a predictable database state before tests are executed.
 
 ### ⚡ Async/Await & Express 5
 
@@ -82,39 +126,40 @@ This allows the application to be imported independently for testing.
 
 The backend uses middleware for:
 
-* JSON request body parsing
-* Authentication
-* Request logging
-* Unknown endpoint handling
-* Centralized error handling
+- JSON request body parsing
+- Authentication
+- Request logging
+- Unknown endpoint handling
+- Centralized error handling
 
 Custom middleware includes:
 
-* Token extraction
-* User extraction
-* Request logging
-* Unknown endpoint handling
-* Centralized error handling
+- Token extraction
+- User extraction
+- Request logging
+- Unknown endpoint handling
+- Centralized error handling
 
 ### 🚨 Centralized Error Handling
 
 The backend handles common application and database errors including:
 
-* `CastError`
-* `ValidationError`
-* `MongoServerError` duplicate-key errors
-* `JsonWebTokenError`
-* `TokenExpiredError`
+- `CastError`
+- `ValidationError`
+- `MongoServerError` duplicate-key errors
+- `JsonWebTokenError`
+- `TokenExpiredError`
 
 Errors are converted into standardized HTTP responses.
 
 ## 📁 Directory Structure
 
 ```text
-backend/
+notes-backend/
 ├── controllers/
 │   ├── login.js
 │   ├── notes.js
+│   ├── testing.js
 │   └── users.js
 │
 ├── models/
@@ -137,17 +182,17 @@ backend/
 
 ## 🚀 Tech Stack
 
-* Node.js
-* Express.js 5
-* MongoDB Atlas
-* Mongoose
-* bcrypt
-* jsonwebtoken
-* node:test
-* supertest
-* ESLint
-* cross-env
-* dotenv
+- Node.js
+- Express.js 5
+- MongoDB Atlas
+- Mongoose
+- bcrypt
+- jsonwebtoken
+- node:test
+- supertest
+- ESLint
+- cross-env
+- dotenv
 
 ## 🛠️ How to Run Locally
 
@@ -180,10 +225,56 @@ npm run test
 npm run dev
 ```
 
-### 5. Seed the database
+The backend runs on port `3001`.
+
+### 5. Start the backend in test mode
+
+```bash
+npm run start:test
+```
+
+Test mode sets:
+
+```text
+NODE_ENV=test
+```
+
+This enables the test-only API used by the Playwright end-to-end test suite.
+
+### 6. Seed the database
 
 Use the database utility when sample data needs to be created:
 
 ```bash
 node mongo.js
 ```
+
+## 🧪 Test Database Initialization
+
+The E2E test suite resets the test database before each test through:
+
+```text
+POST /api/testing/reset
+```
+
+The reset process:
+
+```text
+POST /api/testing/reset
+        ↓
+Delete all notes
+        ↓
+Delete all users
+        ↓
+204 No Content
+```
+
+The test suite can then create the specific user/data required for the test before interacting with the application through the browser.
+
+The reset endpoint is intentionally available only when:
+
+```text
+NODE_ENV=test
+```
+
+so that the database-reset functionality is not exposed during normal development or production operation.

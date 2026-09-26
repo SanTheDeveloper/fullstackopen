@@ -1,6 +1,6 @@
 # 📝 Notes App - Frontend UI
 
-This is the React frontend for the continuous tutorial track of the Full Stack Open curriculum. It serves as a living application where new frontend architectural concepts, state management techniques, authentication patterns, and server communication strategies are implemented and tested.
+This is the React frontend for the continuous tutorial track of the Full Stack Open curriculum. It serves as a living application where new frontend architectural concepts, state management techniques, authentication patterns, server communication strategies, and testing practices are implemented and tested.
 
 ## 🧠 Architectural Concepts & Features
 
@@ -78,7 +78,7 @@ Network logic is separated into the service module:
 ```text
 src/services/
 └── notes.js
-````
+```
 
 ### ⚡ Initial Data Loading
 
@@ -130,59 +130,107 @@ The tests use:
 
 The tests prioritize user-visible behavior over implementation details such as CSS selectors.
 
-### 📊 Test Coverage
+### 🌐 End-to-End Testability
+
+The frontend is also exercised by the Playwright end-to-end test suite in the separate `notes-e2e` project.
+
+The frontend uses user-facing and accessible elements so that E2E tests can locate controls in a way that closely matches how a user interacts with the application.
+
+For example, login inputs are associated with explicit labels:
+
+```jsx
+<label>
+  username
+  <input
+    type="text"
+    value={username}
+    onChange={handleUsernameChange}
+  />
+</label>
+
+<label>
+  password
+  <input
+    type="password"
+    value={password}
+    onChange={handlePasswordChange}
+  />
+</label>
+```
+
+This allows Playwright tests to locate the fields using:
+
+```js
+page.getByLabel("username");
+page.getByLabel("password");
+```
+
+rather than relying on the positional order of textboxes.
+
+Interactive controls such as login, new note, save, and note-importance buttons expose meaningful visible names so that Playwright can locate them using role-based queries such as:
+
+```js
+page.getByRole("button", { name: "login" });
+page.getByRole("button", { name: "new note" });
+page.getByRole("button", { name: "save" });
+```
+
+This keeps the frontend testable through the same user-facing interface that E2E tests are intended to simulate.
+
+## 📊 Test Coverage
 
 Vitest can generate a coverage report for the frontend:
 
 ```bash
 npm test -- --coverage
-````
+```
 
 The generated report is stored in the `coverage/` directory, which is excluded from version control.
 
-### 🧹 Code Quality
+## 🧹 Code Quality
 
 ESLint is configured to maintain a consistent JavaScript and JSX coding style.
 
 The project currently uses:
 
-* 2-space indentation
-* Double quotes
-* Semicolons
-* Strict equality
-* Consistent object spacing
-* Consistent arrow-function spacing
-* Unix line endings
-* No trailing whitespace
-* Console statements permitted during development
-
-````
+- 2-space indentation
+- Double quotes
+- Semicolons
+- Strict equality
+- Consistent object spacing
+- Consistent arrow-function spacing
+- Unix line endings
+- No trailing whitespace
+- Console statements permitted during development
 
 ## 📁 Frontend Structure
 
 ```text
-src/
-├── components/
-│   ├── Footer.jsx
-│   ├── LoginForm.jsx
-│   ├── Note.jsx
-│   ├── Note.test.jsx
-│   ├── NoteForm.jsx
-│   ├── NoteForm.test.jsx
-│   ├── Notification.jsx
-│   ├── Togglable.jsx
-│   └── Togglable.test.jsx
+notes-frontend/
+├── src/
+│   ├── components/
+│   │   ├── Footer.jsx
+│   │   ├── LoginForm.jsx
+│   │   ├── Note.jsx
+│   │   ├── Note.test.jsx
+│   │   ├── NoteForm.jsx
+│   │   ├── NoteForm.test.jsx
+│   │   ├── Notification.jsx
+│   │   ├── Togglable.jsx
+│   │   └── Togglable.test.jsx
+│   │
+│   ├── services/
+│   │   ├── login.js
+│   │   └── notes.js
+│   │
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 │
-├── services/
-│   ├── login.js
-│   └── notes.js
-│
-├── App.jsx
-├── index.css
-└── main.jsx
-
-testSetup.js
-vite.config.js
+├── testSetup.js
+├── vite.config.js
+├── package.json
+└── README.md
 ```
 
 ## 🚀 Tech Stack
@@ -203,7 +251,7 @@ vite.config.js
 
 ```bash
 npm install
-````
+```
 
 ### 2. Ensure the Notes App Backend is running
 
