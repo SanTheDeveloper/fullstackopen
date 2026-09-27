@@ -47,7 +47,7 @@ const Blog = ({ blog, updateBlog, showNotification, user, removeBlog }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div data-testid="blog" style={blogStyle}>
       {blog.title} {blog.author}
       <button onClick={() => setShowDetails((current) => !current)}>
         {showDetails ? "hide" : "view"}
@@ -56,7 +56,7 @@ const Blog = ({ blog, updateBlog, showNotification, user, removeBlog }) => {
         <>
           <div>{blog.url}</div>
           <div>
-            likes {blog.likes}
+            <span>likes {blog.likes}</span>
             <button onClick={handleLike}>like</button>
           </div>
           <div>{blog.user?.name}</div>
