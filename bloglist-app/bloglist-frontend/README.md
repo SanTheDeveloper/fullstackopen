@@ -1,90 +1,61 @@
-# 📚 Blog List - Frontend UI
+# 📝 Blog List - Frontend UI
 
-This is the React frontend for the Blog List application, built as part of the Full Stack Open curriculum. It provides an interactive interface for authenticated users to create, browse, like, and delete blog posts.
+This is the React frontend for the Blog List application from the Full Stack Open curriculum.
+
+The application provides the user interface for authentication, creating blogs, viewing blog details, liking blogs, and deleting blogs. The frontend communicates with the Blog List backend through a REST API and is also covered by component tests and Playwright end-to-end tests.
 
 ## 🧠 Architectural Concepts & Features
 
 ### 🔐 Authentication & Session Management
 
 - Implements JWT-based login through the backend authentication API.
-- Stores the authenticated user in React application state.
+- Stores the authenticated user in React state.
 - Persists the login session using `window.localStorage`.
 - Restores the authenticated user when the application starts.
-- Clears the authentication state and token when the user logs out.
-- Conditionally renders the application according to authentication state.
+- Supplies the authentication token to protected API requests.
+- Conditionally renders functionality according to authentication state.
+- Supports logout and clears the stored authentication state.
 
 ### 🧩 Component-Driven Architecture
 
 The frontend is divided into reusable components with focused responsibilities:
 
 - `LoginForm` — handles the login form UI.
-- `BlogForm` — manages creation of new blog posts.
-- `Blog` — displays individual blog posts and their interactive functionality.
-- `Notification` — displays success and error messages.
-- `Togglable` — provides reusable visibility control using `props.children` and component refs.
+- `BlogForm` — manages creation of new blogs and its local form state.
+- `Blog` — renders an individual blog and its interactive details.
+- `Notification` — displays operation feedback.
+- `Togglable` — provides reusable visibility control.
 
 This keeps `App.jsx` focused on application-level state and coordination.
 
 ### 📝 Controlled Forms & State Management
 
 - Uses React `useState` for controlled form inputs.
-- Form-specific state is kept inside the components responsible for those forms.
-- Parent-level state is used when multiple components need to coordinate changes.
-- Callback functions are passed through props for operations such as creating, updating, and removing blogs.
+- Keeps form-specific state inside the component responsible for the form.
+- Uses callbacks passed through props when child components need to trigger changes in application-level state.
+- Uses lifting of state when multiple components need to coordinate shared data.
+- Uses local component state to toggle blog details between `view` and `hide`.
 
-### 👁️ Blog Details
+### 👶 `props.children`
 
-Each blog maintains its own visibility state.
+The `Togglable` component uses `props.children` to render arbitrary React content inside a reusable visibility container.
 
-Users can:
+This allows the same component to wrap different children without knowing what those children contain.
 
-- View the basic blog information.
-- Expand the blog to display its URL, likes, creator, and actions.
-- Hide the details again.
+### 🌐 Asynchronous Server Communication
 
-The visibility state is maintained locally inside each `Blog` component instance.
+Axios is used to communicate with the backend REST API.
 
-### ❤️ Like Functionality
+The frontend supports:
 
-The like button sends an HTTP `PUT` request to the backend.
+- `GET` for retrieving blogs
+- `POST` for creating blogs
+- `PUT` for updating blog data, including likes
+- `DELETE` for deleting blogs
 
-Because the backend update operation replaces the blog document, the frontend sends the complete blog object required by the API.
+Protected requests include the authentication token through the `Authorization: Bearer <token>` header.
 
-After a successful update, the corresponding blog in the application state is replaced with the updated blog returned by the backend.
-
-### 🗑️ Blog Deletion
-
-Authenticated users can delete only blogs they created.
-
-The frontend:
-
-- Displays the remove button only for the blog creator.
-- Uses `window.confirm()` before deletion.
-- Sends the authenticated `DELETE` request to the backend.
-- Removes the deleted blog from React state after successful deletion.
-
-### 📊 Blog Sorting
-
-Blog posts are displayed in descending order according to their number of likes.
-
-The frontend uses JavaScript array sorting to create the ordered blog list without directly mutating the React state array.
-
-### 🔔 Notifications
-
-The `Notification` component displays operation feedback to the user.
-
-Notifications support:
-
-- Success messages
-- Error messages
-- Conditional rendering
-- Different visual styles based on notification type
-
-### 🌐 HTTP Communication
-
-Axios is used for communication with the backend REST API.
-
-Network logic is separated from React components through dedicated service modules:
+Network logic is separated into service modules:
 
 ```text
 src/services/
@@ -92,19 +63,147 @@ src/services/
 └── login.js
 ```
 
-The blog service handles:
+### 🔄 Blog State Updates
 
-- Fetching blogs
-- Creating blogs
-- Updating blogs
-- Deleting blogs
-- Managing the authentication token
+The frontend updates application state after successful server operations.
 
-### 🧹 Code Quality
+This includes:
 
-ESLint is configured to enforce a consistent JavaScript and JSX coding style.
+- Adding newly created blogs to the displayed list.
+- Updating a blog after a like.
+- Removing a deleted blog from the displayed list.
+- Keeping the rendered UI synchronized with backend responses.
 
-The project currently enforces:
+### 👤 Blog Ownership
+
+The application only displays the `remove` button when the currently logged-in user is the creator of the blog.
+
+The ownership check compares the authenticated user's username with the username associated with the blog.
+
+### 🔔 Error Handling & UI Feedback
+
+The frontend handles failed asynchronous operations through error handling and displays feedback through the `Notification` component.
+
+Notifications provide visual feedback for unsuccessful login, creation, update, and deletion operations.
+
+### 🧪 Component Testing
+
+The frontend uses Vitest and React Testing Library to test React components in a simulated browser environment.
+
+The testing stack includes:
+
+- **Vitest** — test runner and assertion library
+- **jsdom** — simulated browser DOM environment
+- **React Testing Library** — renders React components and provides UI queries
+- **jest-dom** — provides expressive DOM assertions
+- **user-event** — simulates user interactions such as typing and clicking
+
+Current component tests cover blog-related UI behavior, including:
+
+- Rendering blog content
+- Blog button interaction
+- Showing and hiding blog details
+- Blog form input and submission
+- Callback invocation and submitted data
+
+Test files are colocated with the components they test.
+
+### 🔎 Testing Patterns
+
+The tests use:
+
+- `render()` to render components in the test environment
+- `screen` queries such as `getByText`, `getByRole`, `getByLabelText`, and `getByPlaceholderText`
+- `getBy*`, `queryBy*`, and `findBy*` according to whether an element should exist, may be absent, or should appear asynchronously
+- `userEvent.setup()` and asynchronous user interactions
+- `vi.fn()` mock functions to record callback calls and arguments
+- `beforeEach()` for fresh component setup
+- `screen.debug()` for debugging rendered output
+- `toBeVisible()`, `toHaveTextContent()`, and other DOM assertions
+
+The tests prioritize user-visible behavior over implementation details such as CSS selectors.
+
+### 🌐 End-to-End Testability
+
+The frontend is also exercised by the Playwright end-to-end test suite in the separate `bloglist-e2e` project.
+
+The frontend uses user-facing and accessible elements so that E2E tests can locate controls in a way that closely matches how a user interacts with the application.
+
+Login inputs are associated with explicit labels:
+
+```jsx
+<label>
+  username
+  <input
+    type="text"
+    value={username}
+    onChange={handleUsernameChange}
+  />
+</label>
+
+<label>
+  password
+  <input
+    type="password"
+    value={password}
+    onChange={handlePasswordChange}
+  />
+</label>
+```
+
+This allows Playwright tests to locate the fields using:
+
+```js
+page.getByLabel("username");
+page.getByLabel("password");
+```
+
+Interactive controls expose meaningful visible names so that Playwright can locate them using role-based queries:
+
+```js
+page.getByRole("button", { name: "login" });
+page.getByRole("button", { name: "create new blog" });
+page.getByRole("button", { name: "create" });
+page.getByRole("button", { name: "view" });
+page.getByRole("button", { name: "like" });
+page.getByRole("button", { name: "remove" });
+```
+
+Each blog also exposes a test identifier:
+
+```jsx
+<div data-testid="blog">
+```
+
+This allows E2E tests to locate all blogs and scope actions to a specific blog with Playwright locator chaining and `filter()`.
+
+For example:
+
+```js
+const blog = page
+  .getByTestId("blog")
+  .filter({ hasText: "Arc Reactor Explained" });
+```
+
+The likes text is wrapped in a `span` so tests can locate the visible like count separately from the adjacent `like` button.
+
+The frontend therefore remains testable through the same user-facing interface that the E2E tests are intended to simulate.
+
+## 📊 Test Coverage
+
+Vitest can generate a coverage report for the frontend:
+
+```bash
+npm test -- --coverage
+```
+
+The generated report is stored in the `coverage/` directory, which is excluded from version control.
+
+## 🧹 Code Quality
+
+ESLint is configured to maintain a consistent JavaScript and JSX coding style.
+
+The project currently uses:
 
 - 2-space indentation
 - Double quotes
@@ -114,74 +213,33 @@ The project currently enforces:
 - Consistent arrow-function spacing
 - Unix line endings
 - No trailing whitespace
+- Console statements permitted during development
 
-Console statements are permitted during development.
-
-### 🧪 Component Testing
-
-The frontend uses component-level tests to verify React component behavior and user interactions.
-
-Testing tools:
-
-- `Vitest` — test runner, assertions, and mocks
-- `jsdom` — simulated browser environment
-- `React Testing Library` — renders components and queries the UI
-- `jest-dom` — DOM-specific assertions
-- `user-event` — simulates realistic user interactions
-
-Current tests cover:
-
-- `Blog` component rendering
-- blog detail visibility
-- like-button interactions
-- `BlogForm` submission
-- callback invocation and arguments
-
-The tests focus on observable component behavior rather than implementation details.
-
-Typical testing flow:
+## 📁 Frontend Structure
 
 ```text
-Render component
-→ find user-facing element
-→ perform user interaction
-→ assert visible result or callback behavior
-````
-
-Test files are colocated with their components:
-
-```text
-src/components/
-├── Blog.jsx
-├── Blog.test.jsx
-├── BlogForm.jsx
-└── BlogForm.test.jsx
-```
-
-The frontend test environment is configured through `vite.config.js` and `testSetup.js`.
-
-## 🧱 Frontend Structure
-
-```text
-src/
-├── components/
-│   ├── Blog.jsx
-│   ├── Blog.test.jsx
-│   ├── BlogForm.jsx
-│   ├── BlogForm.test.jsx
-│   ├── LoginForm.jsx
-│   ├── Notification.jsx
-│   └── Togglable.jsx
+bloglist-frontend/
+├── src/
+│   ├── components/
+│   │   ├── Blog.jsx
+│   │   ├── Blog.test.jsx
+│   │   ├── BlogForm.jsx
+│   │   ├── BlogForm.test.jsx
+│   │   ├── LoginForm.jsx
+│   │   ├── Notification.jsx
+│   │   └── Togglable.jsx
+│   │
+│   ├── services/
+│   │   ├── blogs.js
+│   │   └── login.js
+│   │
+│   ├── App.jsx
+│   └── main.jsx
 │
-├── services/
-│   ├── blogs.js
-│   └── login.js
-│
-├── App.jsx
-└── main.jsx
-
-testSetup.js
-vite.config.js
+├── testSetup.js
+├── vite.config.js
+├── package.json
+└── README.md
 ```
 
 ## 🚀 Tech Stack
@@ -198,24 +256,42 @@ vite.config.js
 
 ## 🛠️ How to Run Locally
 
-1. Ensure the **Blog List Backend** is running on port `3003`.
-
-2. Ensure `vite.config.js` proxies `/api` requests to:
-
-```text
-http://localhost:3003
-```
-
-3. Install dependencies:
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-4. Start the Vite development server:
+### 2. Ensure the Blog List Backend is running
+
+The backend runs on port `3003`.
+
+### 3. Start the Vite development server
 
 ```bash
 npm run dev
+```
+
+The frontend development server runs on port `5173`.
+
+## 🧪 Testing
+
+Run the complete frontend test suite:
+
+```bash
+npm test
+```
+
+Run the tests with coverage:
+
+```bash
+npm test -- --coverage
+```
+
+End-to-end tests are maintained separately in:
+
+```text
+../bloglist-e2e/
 ```
 
 ## 🧹 Linting
@@ -230,12 +306,4 @@ Automatically fix supported lint issues with:
 
 ```bash
 npm run lint -- --fix
-```
-
-## 🧪 Testing
-
-Run the frontend tests with:
-
-```bash
-npm test
 ```

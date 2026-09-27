@@ -1,159 +1,202 @@
-# 📚 Blog List - Backend API
+# ⚙️ Blog List - Backend API
 
-This is the Express.js REST API for the Blog List application. It provides the backend services required by the React frontend, including user management, JWT authentication, blog CRUD operations, authorization, MongoDB persistence, and automated testing.
+This is the Express.js REST API that powers the Blog List application from the Full Stack Open curriculum.
+
+It provides the backend services required by the React frontend, including user management, JWT authentication, blog CRUD operations, middleware processing, MongoDB persistence, automated testing, and support for Playwright end-to-end test initialization.
 
 ## 🧠 Architectural Concepts & Features
 
-### 🔐 Authentication & Authorization
+### 🔐 User Administration & Authentication
 
-- Creates and manages users.
+- Manages user creation and authentication.
 - Hashes passwords securely using `bcrypt`.
-- Uses `jsonwebtoken` for stateless JWT authentication.
-- Extracts and verifies bearer tokens through custom middleware.
-- Associates newly created blogs with the authenticated user.
-- Protects blog deletion so that only the creator can delete their blog.
-
-Protected requests use:
-
-```text
-Authorization: Bearer <token>
-```
+- Uses `jsonwebtoken` (JWT) for stateless token-based authentication.
+- Protects authenticated operations through HTTP `Authorization: Bearer <token>` headers.
+- Identifies the authenticated user through custom authentication middleware.
 
 ### 🔗 User-Blog Relationships
 
-Blogs store a reference to the user who created them using a MongoDB ObjectId.
+Blogs are associated with their creators through Mongoose ObjectId references.
 
-Mongoose `populate()` is used to resolve the referenced user when returning blog data.
+Mongoose `populate()` is used when related user information needs to be resolved across collections.
 
-For example:
-
-```js
-Blog.find({}).populate("user", {
-  username: 1,
-  name: 1,
-});
-```
-
-The `PUT` operation also populates the user information before returning the updated blog to the frontend.
+Blog responses expose the associated user's `username` and `name` where user information is required by the frontend.
 
 ### 🧩 Modular Routing
 
-The API is divided into dedicated controller modules:
+API functionality is separated into dedicated controller modules:
 
 ```text
 controllers/
 ├── blogs.js
 ├── users.js
-└── login.js
+├── login.js
+└── testing.js
 ```
 
-Each controller contains its related Express Router definitions.
+Express Router is used to keep route definitions modular and maintain a clean root application.
 
-### 🔄 Blog CRUD Operations
+### 🔄 RESTful API
 
-The backend provides:
+The backend provides RESTful operations for blog and user resources.
 
-- `GET /api/blogs`
-- `POST /api/blogs`
-- `PUT /api/blogs/:id`
-- `DELETE /api/blogs/:id`
+The Blog List API supports:
 
-Blog creation requires authentication.
+- Retrieving blogs
+- Creating blogs
+- Updating blogs
+- Deleting blogs
 
-Blog deletion requires authentication and verifies that the authenticated user is the creator of the blog.
-
-The `PUT` endpoint is used by the frontend for blog updates such as increasing likes and returns the updated blog with its populated user information.
+Authenticated operations are protected through the custom authentication middleware.
 
 ### 🧪 Automated Testing
 
 The backend uses:
 
-- Native `node:test`
+- `node:test`
 - `supertest`
 
-The test suite includes:
+The test environment uses a dedicated MongoDB database.
 
-- Blog array calculation tests
-- API integration tests
-- HTTP status code verification
-- Response body validation
-- User administration tests
-- Authentication and authorization checks
-- CRUD endpoint testing
-- Database cleanup and test data initialization
+Backend tests cover API behavior, response status codes, authentication, validation, and application functionality.
 
-The tests run against a dedicated test database.
+### 🌍 Environment Management
 
-### 🗄️ MongoDB & Mongoose
+The application supports separate development, test, and production environments.
 
-MongoDB Atlas is used for persistent application data.
+`cross-env` and environment variables are used to select the appropriate runtime configuration and MongoDB connection settings.
 
-Mongoose provides:
+The backend can be started specifically in test mode with:
 
-- Schema definitions
-- Validation
-- Default values
-- Unique constraints
-- ObjectId references
-- Document population
-
-The database contains related `User` and `Blog` documents connected through Mongoose references.
-
-### ⚙️ Environment Management
-
-Environment variables are used to configure:
-
-- Development MongoDB URI
-- Test MongoDB URI
-- JWT secret
-- Server port
-
-Sensitive configuration is stored in `.env`.
-
-### 🚨 Error Handling
-
-The backend contains centralized handling for common application and database errors, including:
-
-- `CastError`
-- `ValidationError`
-- MongoDB duplicate-key errors
-- `JsonWebTokenError`
-- `TokenExpiredError`
-
-Unknown routes are handled by a dedicated `unknownEndpoint` middleware.
-
-### 🪵 Logging
-
-Application logging is centralized through:
-
-```text
-utils/logger.js
+```bash
+npm run start:test
 ```
 
-This keeps logging behavior consistent across the application.
+This starts the server with:
+
+```text
+NODE_ENV=test
+```
+
+### 🌐 End-to-End Test Support
+
+The backend provides a test-only API endpoint for initializing the database used by the Playwright end-to-end test suite.
+
+The testing router is mounted only when the backend runs in test mode:
+
+```js
+if (process.env.NODE_ENV === "test") {
+  const testingRouter = require("./controllers/testing");
+  app.use("/api/testing", testingRouter);
+}
+```
+
+This makes the reset endpoint available only in the test environment.
+
+The endpoint is:
+
+```text
+POST /api/testing/reset
+```
+
+It clears the test database by removing all blogs and users.
+
+The endpoint returns:
+
+```text
+204 No Content
+```
+
+The E2E test suite uses this endpoint to establish a predictable database state before tests are executed.
+
+### ⚡ Async/Await & Express 5
+
+Route controllers use `async/await` syntax.
+
+The application takes advantage of Express 5's automatic propagation of rejected promises to the centralized error-handling middleware.
+
+### 🧱 Separation of Concerns
+
+The Express application configuration is separated from the network listener:
+
+```text
+app.js    → application configuration
+index.js  → server startup
+```
+
+This allows the application to be imported independently for testing.
 
 ## 🛡️ Middleware Pipeline
 
 The backend uses middleware for:
 
-- JSON body parsing
-- CORS handling
+- JSON request body parsing
+- Authentication
+- Request logging
+- Unknown endpoint handling
+- Centralized error handling
+
+Custom middleware includes:
+
 - Token extraction
 - User extraction
 - Request logging
 - Unknown endpoint handling
 - Centralized error handling
 
-Authentication middleware identifies the currently authenticated user from the JWT and makes that user available to protected route handlers.
+### 🚨 Centralized Error Handling
+
+The backend handles common application and database errors including:
+
+- `CastError`
+- `ValidationError`
+- `MongoServerError` duplicate-key errors
+- `JsonWebTokenError`
+- `TokenExpiredError`
+
+Errors are converted into standardized HTTP responses.
+
+## 📡 Main API Endpoints
+
+### Blogs
+
+```text
+GET     /api/blogs
+POST    /api/blogs
+PUT     /api/blogs/:id
+DELETE  /api/blogs/:id
+```
+
+### Users
+
+```text
+GET     /api/users
+POST    /api/users
+```
+
+### Authentication
+
+```text
+POST    /api/login
+```
+
+### Testing
+
+Available only when running with `NODE_ENV=test`:
+
+```text
+POST    /api/testing/reset
+```
 
 ## 📁 Directory Structure
 
 ```text
-backend/
+bloglist-backend/
 ├── controllers/
 │   ├── blogs.js
-│   ├── users.js
-│   └── login.js
+│   ├── login.js
+│   ├── testing.js
+│   └── users.js
 │
 ├── models/
 │   ├── blog.js
@@ -165,11 +208,13 @@ backend/
 ├── utils/
 │   ├── config.js
 │   ├── logger.js
-│   └── middleware.js
+│   ├── middleware.js
+│   └── ...
 │
 ├── app.js
 ├── index.js
-└── mongo.js
+├── mongo.js
+└── README.md
 ```
 
 ## 🚀 Tech Stack
@@ -183,6 +228,7 @@ backend/
 - node:test
 - supertest
 - ESLint
+- cross-env
 - dotenv
 
 ## 🛠️ How to Run Locally
@@ -192,11 +238,13 @@ backend/
 Create a `.env` file in the backend root:
 
 ```env
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../bloglistApp
-TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testBloglistApp
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../blogApp
+TEST_MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.../testBlogApp
 SECRET=your_super_secret_cryptographic_key
 PORT=3003
 ```
+
+Keep real credentials and secrets out of version control.
 
 ### 2. Install dependencies
 
@@ -204,20 +252,68 @@ PORT=3003
 npm install
 ```
 
-### 3. Start the development server
-
-```bash
-npm run dev
-```
-
-### 4. Run the automated test suite
+### 3. Run the automated test suite
 
 ```bash
 npm run test
 ```
 
-### 5. Seed the database
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+The backend runs on port `3003`.
+
+### 5. Start the backend in test mode
+
+```bash
+npm run start:test
+```
+
+Test mode sets:
+
+```text
+NODE_ENV=test
+```
+
+This enables the test-only API used by the Playwright end-to-end test suite.
+
+### 6. Seed the database
+
+Use the database utility when sample data needs to be created:
 
 ```bash
 node mongo.js
 ```
+
+## 🧪 Test Database Initialization
+
+The E2E test suite resets the test database before each test through:
+
+```text
+POST /api/testing/reset
+```
+
+The reset process:
+
+```text
+POST /api/testing/reset
+        ↓
+Delete all blogs
+        ↓
+Delete all users
+        ↓
+204 No Content
+```
+
+The test suite can then create the specific users and blog data required for each test before interacting with the application through the browser.
+
+The reset endpoint is intentionally available only when:
+
+```text
+NODE_ENV=test
+```
+
+so that the database-reset functionality is not exposed during normal development or production operation.
