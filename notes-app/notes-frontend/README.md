@@ -27,6 +27,29 @@ The frontend is divided into reusable components with focused responsibilities:
 
 This keeps `App.jsx` focused on application-level state and coordination.
 
+### 🧭 Client-Side Routing with React Router
+
+The application uses `BrowserRouter` to provide client-side navigation without
+full-page reloads. `Routes` and `Route` map URLs to views, while `Link` provides
+navigation links. The current routes are:
+
+- `/` — home page
+- `/notes` — notes list
+- `/notes/:id` — an individual note, selected using `useMatch`
+- `/create` — note creation form
+
+`useParams` reads the note ID in the note detail view, and `useNavigate` allows
+components to navigate programmatically, such as returning to `/notes` after
+creating or deleting a note. Giving views distinct URLs supports browser history
+and direct links to a note.
+
+### 🎨 UI Framework with Material UI
+
+Material UI (MUI) components are used to build and style parts of the interface,
+including the navigation bar, notes table, form controls, buttons, and
+notification alerts. This provides reusable UI building blocks while keeping
+the application's routing and data handling in React components.
+
 ### 📝 Controlled Forms & State Management
 
 - Uses React `useState` for controlled form inputs.
@@ -237,6 +260,8 @@ notes-frontend/
 
 - React 19
 - Vite
+- React Router DOM
+- Material UI (MUI) and Emotion
 - Axios
 - Vitest
 - jsdom

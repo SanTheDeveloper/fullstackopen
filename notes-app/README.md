@@ -72,6 +72,9 @@ The Notes application is being developed as a continuous learning application wh
 Current concepts include:
 
 * React functional components and hooks
+* Client-side navigation with React Router and URL-based views
+* Route parameters and programmatic navigation between note views
+* UI framework components and styling with Material UI (MUI)
 * Controlled forms
 * Conditional rendering
 * State management and state lifting
@@ -103,6 +106,9 @@ Current concepts include:
 * UI mode and Trace Viewer
 * Asynchronous UI synchronization and race-condition debugging
 * ESLint configuration and code-quality enforcement
+
+The notes app uses React Router for client-side navigation between URL-based
+views and Material UI (MUI) components to build and style its interface.
 
 ## 🔐 Authentication & Session Management
 
