@@ -9,6 +9,8 @@ To simulate a professional engineering environment, this repository utilizes an 
 - **`/phonebook-app` (Primary Assignment Track)** A full-stack contact management system. Features a React SPA synchronized with a custom Node.js/Express REST API. Implements controlled forms, dynamic state filtering, backend data validation, and request logging.
 - **`/notes-app` (Continuous Tutorial Track)**
   A full-stack note-taking application used as the primary sandbox for integrating new architectural concepts, React rendering flows, and Express routing logic as the curriculum advances.
+- **`/bloglist-app` (Part 5: Testing React Apps)**
+  A full-stack blog application with user authentication, blog creation and interactions, routed blog details, Material UI styling, component tests, and Playwright end-to-end tests.
 - **`/course-exercises` (Core Fundamentals)**
   A flattened collection of standalone modules and isolated practice environments built to master foundational React concepts.
   - _Data for Countries:_ Integrates multiple third-party APIs (REST Countries, OpenWeatherMap) with dynamic UI rendering.
@@ -20,6 +22,7 @@ To simulate a professional engineering environment, this repository utilizes an 
 - **Part 1:** Fundamentals of React (Completed)
 - **Part 2:** Communicating with Server (Completed)
 - **Part 3:** Node.js and Express API Design (In Progress)
+- **Part 5:** Testing React Apps (Completed — exercises 5.1–5.31)
 
 ## 🛠️ Tech Stack
 
