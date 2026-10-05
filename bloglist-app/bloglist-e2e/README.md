@@ -121,7 +121,10 @@ The current test suite is configured to use Chromium for the Blog List E2E exerc
 
 ## 🧪 Test Coverage
 
-The test suite covers exercises 5.17–5.23.
+The current checked-in tests cover login success and failure, blog creation,
+liking a blog, and deleting a blog created by the logged-in user. These tests
+exercise the routed blog detail view; visual styling from exercises 5.29–5.31 is
+not asserted by this E2E suite.
 
 ### 5.17 — Login Form
 

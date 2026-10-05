@@ -1,20 +1,24 @@
-import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
+import { useState, useEffect } from "react";
+import { Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
+import { AppBar, Box, Button, Container, Toolbar, Typography } from "@mui/material";
+
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
+import BlogRoute from "./components/BlogRoute";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
+  // Keep protected routes from redirecting until the saved session is checked.
+  const [userChecked, setUserChecked] = useState(false);
 
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [notificationType, setNotificationType] = useState("success");
 
-  const blogFormRef = useRef();
+  const navigate = useNavigate();
 
   const showNotification = (message, type = "success") => {
     setNotificationMessage(message);
@@ -35,24 +39,31 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    // Restore the user and API token together so protected API calls work
+    // immediately when a saved session is found.
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+
     if (loggedUserJSON) {
       const loggedUser = JSON.parse(loggedUserJSON);
       setUser(loggedUser);
       blogService.setToken(loggedUser.token);
     }
+
+    setUserChecked(true);
   }, []);
 
   const handleLogin = async (credentials) => {
     try {
       const loggedUser = await loginService.login(credentials);
+
       window.localStorage.setItem(
         "loggedBlogappUser",
         JSON.stringify(loggedUser),
       );
+
       blogService.setToken(loggedUser.token);
       setUser(loggedUser);
-
+      navigate("/");
       showNotification(`Welcome back, ${loggedUser.name}`, "success");
     } catch (error) {
       showNotification("wrong username or password", "error");
@@ -64,6 +75,7 @@ const App = () => {
     window.localStorage.removeItem("loggedBlogappUser");
     setUser(null);
     blogService.setToken(null);
+    navigate("/");
     showNotification("Logged out successfully", "success");
   };
 
@@ -71,7 +83,7 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blogObject);
       setBlogs((blogs) => blogs.concat(newBlog));
-      blogFormRef.current.toggleVisibility();
+      navigate("/");
     } catch (error) {
       showNotification("Failed to create blog post", "error");
       console.error(error.message);
@@ -79,6 +91,7 @@ const App = () => {
   };
 
   const handleUpdateBlog = (updatedBlogObj) => {
+    // Replace only the changed blog, keeping the rest of the list intact.
     const updatedBlogs = blogs.map((blog) =>
       blog.id === updatedBlogObj.id ? updatedBlogObj : blog,
     );
@@ -88,45 +101,91 @@ const App = () => {
 
   const handleRemoveBlog = (id) => {
     setBlogs((blogs) => blogs.filter((blog) => blog.id !== id));
+    navigate("/");
   };
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification message={notificationMessage} type={notificationType} />
-        <LoginForm handleLogin={handleLogin} />
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification message={notificationMessage} type={notificationType} />
+    <>
+      <AppBar position="static">
+        <Toolbar sx={{ gap: 1 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Blog App
+          </Typography>
+          <Button component={Link} to="/" color="inherit">
+            blogs
+          </Button>
+          {user && (
+            <Button component={Link} to="/create" color="inherit">
+              new blog
+            </Button>
+          )}
+          {user ? (
+            <Button color="inherit" onClick={handleLogout}>
+              logout
+            </Button>
+          ) : (
+            <Button component={Link} to="/login" color="inherit">
+              login
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
 
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
+      <Container maxWidth="md" sx={{ py: 2 }}>
+        <Notification message={notificationMessage} type={notificationType} />
 
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={handleCreateBlog} />
-      </Togglable>
-
-      {blogs
-        .toSorted((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            updateBlog={handleUpdateBlog}
-            showNotification={showNotification}
-            user={user}
-            removeBlog={handleRemoveBlog}
+        <Routes>
+          <Route
+            path="/blogs/:id"
+            element={
+              <BlogRoute
+                blogs={blogs}
+                updateBlog={handleUpdateBlog}
+                showNotification={showNotification}
+                user={user}
+                removeBlog={handleRemoveBlog}
+              />
+            }
           />
-        ))}
-    </div>
+
+          <Route
+            path="/"
+            element={
+              <>
+                <h2>blogs</h2>
+                {blogs
+                  .toSorted((a, b) => b.likes - a.likes)
+                  .map((blog) => (
+                    <div key={blog.id}>
+                      <Link to={`/blogs/${blog.id}`}>
+                        {blog.title} by {blog.author}
+                      </Link>
+                    </div>
+                  ))}
+              </>
+            }
+          />
+
+          <Route
+            path="/login"
+            element={<LoginForm handleLogin={handleLogin} />}
+          />
+
+          <Route
+            path="/create"
+            element={
+              !userChecked ? (
+                <p>Loading...</p>
+              ) : user ? (
+                <BlogForm createBlog={handleCreateBlog} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+        </Routes>
+      </Container>
+    </>
   );
 };
 

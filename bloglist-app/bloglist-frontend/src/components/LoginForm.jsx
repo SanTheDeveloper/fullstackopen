@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState("");
@@ -14,29 +15,33 @@ const LoginForm = ({ handleLogin }) => {
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <div>
-        <label>
-          username
-          <input
-            type="text"
-            value={username}
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          password
-          <input
-            type="password"
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </label>
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <Box component="section" sx={{ my: 2 }}>
+      <Typography component="h2" variant="h5" sx={{ mb: 2 }}>
+        Log in to application
+      </Typography>
+      <Box
+        component="form"
+        onSubmit={onSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 1, width: 260, ml: 2 }}
+      >
+        <TextField
+          label="username"
+          variant="standard"
+          value={username}
+          onChange={({ target }) => setUsername(target.value)}
+        />
+        <TextField
+          label="password"
+          type="password"
+          variant="standard"
+          value={password}
+          onChange={({ target }) => setPassword(target.value)}
+        />
+        <Button type="submit" variant="contained" sx={{ alignSelf: "flex-start" }}>
+          login
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

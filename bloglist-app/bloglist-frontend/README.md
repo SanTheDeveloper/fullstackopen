@@ -28,13 +28,26 @@ The frontend is divided into reusable components with focused responsibilities:
 
 This keeps `App.jsx` focused on application-level state and coordination.
 
+### 🎨 Material UI
+
+Material UI components provide the interface styling for the application:
+
+- `TextField` and `Button` style the login and blog creation forms.
+- `AppBar`, `Toolbar`, and `Button` build the navigation bar.
+- `Alert` presents success and error notifications.
+- `Card`, `Typography`, and related components style the single-blog view.
+
+### 🧭 Client-Side Routing
+
+React Router renders the blogs list, login form, blog creation form, and individual blog details at their respective routes. Selecting a blog opens its detail route, where its URL, likes, and available actions are displayed.
+
 ### 📝 Controlled Forms & State Management
 
 - Uses React `useState` for controlled form inputs.
 - Keeps form-specific state inside the component responsible for the form.
 - Uses callbacks passed through props when child components need to trigger changes in application-level state.
 - Uses lifting of state when multiple components need to coordinate shared data.
-- Uses local component state to toggle blog details between `view` and `hide`.
+- Renders blog details on an individual route rather than toggling them inline in the list.
 
 ### 👶 `props.children`
 
@@ -102,7 +115,7 @@ Current component tests cover blog-related UI behavior, including:
 
 - Rendering blog content
 - Blog button interaction
-- Showing and hiding blog details
+- Rendering blog details and authentication-dependent blog actions
 - Blog form input and submission
 - Callback invocation and submitted data
 
@@ -225,9 +238,10 @@ bloglist-frontend/
 │   │   ├── Blog.test.jsx
 │   │   ├── BlogForm.jsx
 │   │   ├── BlogForm.test.jsx
-│   │   ├── LoginForm.jsx
-│   │   ├── Notification.jsx
+│   │   ├── BlogRoute.jsx
 │   │   └── Togglable.jsx
+│   │   └── Togglable.jsx
+│   │   │   └── BlogRoute.jsx
 │   │
 │   ├── services/
 │   │   ├── blogs.js
@@ -246,6 +260,8 @@ bloglist-frontend/
 
 - React 19
 - Vite
+- React Router
+- Material UI
 - Axios
 - Vitest
 - jsdom

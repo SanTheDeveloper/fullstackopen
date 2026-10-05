@@ -85,6 +85,8 @@ The Blog List application currently demonstrates:
 * State management
 * Reusable components
 * Component composition with `props.children`
+* Client-side routing with React Router
+* Material UI components for forms, navigation, notifications, and blog details
 * JWT-based authentication
 * Persistent login sessions using `localStorage`
 * Axios-based server communication
@@ -398,6 +400,8 @@ Detailed implementation and learning notes are maintained separately for each la
 
 * React 19
 * Vite
+* React Router
+* Material UI
 * Axios
 * Vitest
 * jsdom

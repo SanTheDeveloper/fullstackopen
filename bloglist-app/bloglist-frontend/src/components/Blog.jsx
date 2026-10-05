@@ -1,18 +1,16 @@
-import { useState } from "react";
 import blogService from "../services/blogs";
+import {
+  Button,
+  Card,
+  CardContent,
+  Link as MuiLink,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 const Blog = ({ blog, updateBlog, showNotification, user, removeBlog }) => {
-  const [showDetails, setShowDetails] = useState(false);
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   const handleLike = async () => {
+    // The API update expects the existing blog fields as well as the new count.
     const newObject = {
       user: blog.user.id,
       likes: blog.likes + 1,
@@ -47,27 +45,37 @@ const Blog = ({ blog, updateBlog, showNotification, user, removeBlog }) => {
   };
 
   return (
-    <div data-testid="blog" style={blogStyle}>
-      {blog.title} {blog.author}
-      <button onClick={() => setShowDetails((current) => !current)}>
-        {showDetails ? "hide" : "view"}
-      </button>
-      {showDetails && (
-        <>
-          <div>{blog.url}</div>
-          <div>
-            <span>likes {blog.likes}</span>
-            <button onClick={handleLike}>like</button>
-          </div>
-          <div>{blog.user?.name}</div>
-          {user && blog.user?.username === user.username && (
-            <div>
-              <button onClick={handleRemove}>remove</button>
-            </div>
+    <Card data-testid="blog" variant="outlined" sx={{ mt: 1, boxShadow: 1 }}>
+      <CardContent>
+        <Typography component="h2" variant="h4" gutterBottom>
+          {blog.author}: {blog.title}
+        </Typography>
+        <MuiLink
+          href={blog.url}
+          target="_blank"
+          rel="noreferrer"
+          sx={{ display: "inline-block", mb: 1 }}
+        >
+          {blog.url}
+        </MuiLink>
+        <Typography color="text.secondary" sx={{ mb: 1 }}>
+          Added by {blog.user?.name}
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+          <Typography>likes {blog.likes}</Typography>
+          {user && (
+            <Button variant="outlined" onClick={handleLike}>
+              like
+            </Button>
           )}
-        </>
-      )}
-    </div>
+          {user && blog.user?.username === user.username && (
+            <Button variant="outlined" color="error" onClick={handleRemove}>
+              remove
+            </Button>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 

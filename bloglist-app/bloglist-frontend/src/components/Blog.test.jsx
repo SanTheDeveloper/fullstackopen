@@ -18,29 +18,40 @@ const blog = {
   user: { id: "u1", name: "Tony Stark", username: "ironman" },
 };
 
-test("renders blog title and author, but not url and likes by default", () => {
+test("unauthenticated users see blog details and likes, but no buttons", () => {
   render(<Blog blog={blog} />);
 
-  expect(screen.getByText(blog.title, { exact: false })).toBeInTheDocument();
-
-  expect(screen.getByText(blog.author, { exact: false })).toBeInTheDocument();
-
-  expect(screen.queryByText(blog.url)).not.toBeInTheDocument();
-  expect(screen.queryByText(`likes ${blog.likes}`)).not.toBeInTheDocument();
-});
-
-test("url and likes are shown when the view button is clicked", async () => {
-  const user = userEvent.setup();
-
-  render(<Blog blog={blog} />);
-
-  await user.click(screen.getByText("view"));
-
-  expect(screen.getByText(blog.url)).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", {
+      name: `${blog.author}: ${blog.title}`,
+    }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: blog.url })).toBeInTheDocument();
   expect(screen.getByText(`likes ${blog.likes}`)).toBeInTheDocument();
+  expect(screen.queryAllByRole("button")).toHaveLength(0);
 });
 
-test("clicking the like button twice calls updateBlog twice", async () => {
+test("authenticated non-creators see the like button, but not the remove button", () => {
+  const user = { username: "another-user" };
+
+  render(<Blog blog={blog} user={user} />);
+
+  expect(screen.getByRole("button", { name: /like/i })).toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: /remove/i }),
+  ).not.toBeInTheDocument();
+});
+
+test("the blog creator sees both the like and remove buttons", () => {
+  const user = { username: "ironman" };
+
+  render(<Blog blog={blog} user={user} />);
+
+  expect(screen.getByRole("button", { name: /like/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /remove/i })).toBeInTheDocument();
+});
+
+test("clicking the like button calls updateBlog", async () => {
   const user = userEvent.setup();
   const updateBlog = vi.fn();
 
@@ -49,14 +60,15 @@ test("clicking the like button twice calls updateBlog twice", async () => {
     likes: blog.likes + 1,
   });
 
-  render(<Blog blog={blog} updateBlog={updateBlog} />);
+  render(
+    <Blog
+      blog={blog}
+      user={{ username: "another-user" }}
+      updateBlog={updateBlog}
+    />,
+  );
 
-  await user.click(screen.getByText("view"));
+  await user.click(screen.getByRole("button", { name: /like/i }));
 
-  const likeButton = screen.getByText("like");
-
-  await user.click(likeButton);
-  await user.click(likeButton);
-
-  expect(updateBlog).toHaveBeenCalledTimes(2);
+  expect(updateBlog).toHaveBeenCalledTimes(1);
 });

@@ -4,6 +4,7 @@ const baseUrl = "/api/blogs";
 let token = null;
 
 const setToken = (newToken) => {
+  // Protected endpoints expect the token in the standard Bearer format.
   token = newToken ? `Bearer ${newToken}` : null;
 };
 
