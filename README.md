@@ -1,39 +1,45 @@
-# Fullstack Open: The MERN Journey 🚀
+# Full Stack Open — Projects & Skills
 
-This repository serves as a technical log of my journey through the Fullstack Open curriculum. It contains a collection of projects and deep-dive practice modules focusing on building scalable, performant, and clean full-stack applications.
 
-## 🏗️ Repository Architecture
+This repository contains hands-on projects and exercises built while learning modern full-stack web development. The work demonstrates practical experience building React interfaces, Node.js APIs, database-backed applications, and automated tests.
 
-To simulate a professional engineering environment, this repository utilizes an **App-Centric Architecture**, decoupling applications from specific timeline-based course parts.
+## Projects
 
-- **`/phonebook-app` (Primary Assignment Track)** A full-stack contact management system. Features a React SPA synchronized with a custom Node.js/Express REST API. Implements controlled forms, dynamic state filtering, backend data validation, and request logging.
-- **`/notes-app` (Continuous Tutorial Track)**
-  A full-stack note-taking application used as the primary sandbox for integrating new architectural concepts, React rendering flows, and Express routing logic as the curriculum advances.
-- **`/bloglist-app` (Part 5: Testing React Apps)**
-  A full-stack blog application with user authentication, blog creation and interactions, routed blog details, Material UI styling, component tests, and Playwright end-to-end tests.
-- **`/course-exercises` (Core Fundamentals)**
-  A flattened collection of standalone modules and isolated practice environments built to master foundational React concepts.
-  - _Data for Countries:_ Integrates multiple third-party APIs (REST Countries, OpenWeatherMap) with dynamic UI rendering.
-  - _Courseinfo, Unicafe, Anecdotes:_ Architectural deep-dives into complex state management, component extraction, and dynamic array rendering (`.map`, `.reduce`).
+### Blog List
 
-## 🗺️ Curriculum Progress
+[`bloglist-app/`](./bloglist-app/) is a full-stack blogging application. Users can authenticate, create blog posts, browse individual post pages, like posts, and delete posts they created. It includes a React frontend, an Express API, MongoDB persistence, and browser-based end-to-end tests.
 
-- **Part 0:** Fundamentals of Web Apps (Completed)
-- **Part 1:** Fundamentals of React (Completed)
-- **Part 2:** Communicating with Server (Completed)
-- **Part 3:** Node.js and Express API Design (In Progress)
-- **Part 4:** Testing Express Servers, user authentication and testing (Completed)
-- **Part 5:** Testing React Apps (Completed)
+### Notes
 
-## 🛠️ Tech Stack & Practices
+[`notes-app/`](./notes-app/) is a full-stack note-taking application used to practice React and backend development. It includes URL-based views, authentication, a REST API, database persistence, and automated tests.
 
-- **Frontend:** React, React Router, Material UI, Emotion, Axios
+### Phonebook
+
+[`phonebook-app/`](./phonebook-app/) is a contact-management application with a React interface and a Node.js/Express backend. It supports creating, filtering, updating, and deleting contacts, with server-side validation and request logging.
+
+### React exercises
+
+[`course-exercises/`](./course-exercises/) contains smaller applications for practicing React fundamentals, including component composition, state management, event handling, lists, forms, and fetching data from external APIs.
+
+## Skills Demonstrated
+
+- **React:** functional components, hooks, props, controlled forms, state lifting, conditional rendering, reusable components, and component composition.
+- **Frontend application development:** client-side routing with React Router; API communication with Axios; responsive, accessible UI components using Material UI and Emotion.
+- **JavaScript and asynchronous programming:** promises, `async`/`await`, event handling, array transformations, and coordinating UI state with server responses.
+- **Backend development:** Node.js and Express REST APIs, modular routing, middleware, request validation, and centralized error handling.
+- **Data and persistence:** MongoDB and Mongoose schemas, relationships between users and posts, and CRUD operations.
+- **Authentication and authorization:** password hashing with bcrypt, JSON Web Tokens, bearer-token requests, protected operations, and ownership-based UI behavior.
+- **Testing:** frontend component tests with Vitest and React Testing Library; API integration tests with `node:test` and Supertest; browser E2E tests with Playwright.
+- **Test quality:** accessible role- and label-based queries, mock functions, isolated test data, test-only database reset support, and synchronization on observable UI outcomes.
+- **Development workflow:** Git, Vite, ESLint, environment-based configuration, and API testing with Postman or REST Client.
+
+## Technology
+
+- **Frontend:** React, React Router, Material UI, Emotion, Axios, Vite
 - **Backend:** Node.js, Express, MongoDB, Mongoose
-- **Authentication & security:** JSON Web Tokens (JWT), bcrypt, authorization middleware
 - **Testing:** Vitest, React Testing Library, Jest DOM, Supertest, Playwright
-- **Development tools:** Vite, ESLint, Git, Ubuntu (Linux), VS Code, Postman / REST Client
-- **Practices:** REST API design, client-side routing, controlled forms, component and integration testing, browser-based end-to-end testing
+- **Other tools:** bcrypt, JSON Web Tokens, ESLint, Git
 
-## 👨‍💻 About Me
+## About
 
-Software developer with a strong foundation in Java and the MERN stack. I focus on writing clean, self-documenting code, understanding system execution flow, and maintaining a professional engineering workflow.
+Software developer with a foundation in Java and hands-on experience building full-stack JavaScript applications. I focus on understanding how application layers work together, writing clear and maintainable code, and validating behavior with automated tests.
