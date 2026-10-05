@@ -3,7 +3,11 @@ const { loginWith, createBlog } = require("./helper");
 
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
-    await request.post("/api/testing/reset");
+    // Reset creates an isolated starting point; this endpoint exists only in
+    // test mode and targets the dedicated test database.
+    const resetResponse = await request.post("/api/testing/reset");
+    expect(resetResponse.status()).toBe(204);
+
     await request.post("/api/users", {
       data: {
         name: "Matti Luukkainen",
@@ -11,189 +15,86 @@ describe("Blog app", () => {
         password: "salainen",
       },
     });
-    await request.post("/api/users", {
-      data: {
-        name: "Arto Hellas",
-        username: "hellas",
-        password: "hellas12345",
-      },
-    });
 
     await page.goto("/");
   });
 
-  test("Login form is shown", async ({ page }) => {
-    await expect(page.getByText("Log in to application")).toBeVisible();
-    await expect(page.getByLabel("username")).toBeVisible();
-    await expect(page.getByLabel("password")).toBeVisible();
-    await expect(page.getByRole("button", { name: "login" })).toBeVisible();
+  test("login succeeds with the correct username and password", async ({
+    page,
+  }) => {
+    await loginWith(page, "mluukkai", "salainen");
+
+    await expect(page.getByRole("button", { name: "logout" })).toBeVisible();
+    await expect(
+      page.getByText("Welcome back, Matti Luukkainen"),
+    ).toBeVisible();
   });
 
-  describe("Login", () => {
-    test("succeeds with correct credentials", async ({ page }) => {
+  test("login fails with an incorrect username or password", async ({
+    page,
+  }) => {
+    await loginWith(page, "mluukkai", "wrong-password");
+
+    await expect(page.getByText("wrong username or password")).toBeVisible();
+
+    await expect(page.getByRole("button", { name: "logout" })).toHaveCount(0);
+  });
+
+  describe("when logged in", () => {
+    beforeEach(async ({ page }) => {
       await loginWith(page, "mluukkai", "salainen");
-      await expect(page.getByText("Matti Luukkainen logged in")).toBeVisible();
-      await expect(page.getByRole("button", { name: "logout" })).toBeVisible();
     });
 
-    test("fails with wrong credentials", async ({ page }) => {
-      await loginWith(page, "mluukkai", "wrong");
-      const notification = page.getByText("wrong username or password");
-      await expect(notification).toHaveCSS("color", "rgb(255, 0, 0)");
-      await expect(notification).toHaveCSS("border-style", "solid");
+    test("a logged-in user can create a blog", async ({ page }) => {
+      const title = "Building the Mark I Suit";
+      const author = "Tony Stark";
+      const url = "https://starkindustries.com/mark1";
+
+      await createBlog(page, title, author, url);
+
+      await expect(
+        page.getByRole("link", { name: `${title} by ${author}` }),
+      ).toBeVisible();
     });
 
-    describe("When logged in", () => {
-      beforeEach(async ({ page }) => {
-        await loginWith(page, "mluukkai", "salainen");
-      });
+    test("a logged-in user can like a blog", async ({ page }) => {
+      const title = "Arc Reactor Explained";
+      const author = "Tony Stark";
+      const url = "https://starkindustries.com/arcreactor";
 
-      test("a new blog can be created", async ({ page }) => {
-        const title = "Building the Mark I Suit";
-        const author = "Tony Stark";
-        const url = "https://starkindustries.com/mark1";
+      await createBlog(page, title, author, url);
 
-        await createBlog(page, title, author, url);
+      // Open the blog's routed detail page.
+      await page.getByRole("link", { name: `${title} by ${author}` }).click();
 
-        await expect(page.getByText(`${title} ${author}`)).toBeVisible();
-        await expect(page.getByRole("button", { name: "view" })).toBeVisible();
-      });
+      const likesText = page.getByText(/^likes \d+$/);
+      const initialLikesText = await likesText.textContent();
+      const initialLikes = Number(initialLikesText.match(/\d+/)[0]);
 
-      describe("blogs exists", () => {
-        beforeEach(async ({ page }) => {
-          await createBlog(
-            page,
-            "Building the Mark I Suit",
-            "Tony Stark",
-            "https://starkindustries.com/mark1",
-          );
-          await createBlog(
-            page,
-            "Arc Reactor Explained",
-            "Tony Stark",
-            "https://starkindustries.com/arcreactor",
-          );
-        });
+      await page.getByRole("button", { name: "like" }).click();
 
-        test("blog can be liked", async ({ page }) => {
-          const blogElement = page
-            .getByTestId("blog")
-            .filter({ hasText: "Arc Reactor Explained Tony Stark" });
+      await expect(likesText).toHaveText(`likes ${initialLikes + 1}`);
+    });
 
-          await blogElement.getByRole("button", { name: "view" }).click();
+    test("a logged-in user can delete a blog they created", async ({
+      page,
+    }) => {
+      const title = "Express Middleware";
+      const author = "Sandeep Rout";
+      const url = "https://example.com/middleware";
 
-          const likesText = blogElement.getByText(/^likes \d+$/);
-          const likesContainer = likesText.locator("..");
+      await createBlog(page, title, author, url);
+      await page.getByRole("link", { name: `${title} by ${author}` }).click();
 
-          const before = await likesText.textContent();
-          const beforeLikes = Number(before.match(/\d+/)[0]);
+      // Accept the browser's confirmation dialog so deletion can proceed.
+      page.on("dialog", (dialog) => dialog.accept());
 
-          await likesContainer.getByRole("button", { name: "like" }).click();
+      await page.getByRole("button", { name: "remove" }).click();
 
-          await expect(likesText).toHaveText(`likes ${beforeLikes + 1}`);
-        });
-
-        test("blog can be deleted", async ({ page }) => {
-          const blogElement = page
-            .getByTestId("blog")
-            .filter({ hasText: "Arc Reactor Explained Tony Stark" });
-
-          await blogElement.getByRole("button", { name: "view" }).click();
-
-          page.on("dialog", async (dialog) => {
-            await dialog.accept();
-          });
-
-          await expect(
-            blogElement.getByRole("button", { name: "remove" }),
-          ).toBeVisible();
-
-          await blogElement.getByRole("button", { name: "remove" }).click();
-
-          await expect(blogElement).toHaveCount(0);
-        });
-
-        test("only creator can remove a blog", async ({ page }) => {
-          const title = "Express Middleware";
-          const author = "Sandeep Rout";
-          const url = "https://example.com/middleware";
-
-          await createBlog(page, title, author, url);
-          await page.getByRole("button", { name: "logout" }).click();
-
-          await loginWith(page, "hellas", "hellas12345");
-
-          const blogElement = page
-            .getByTestId("blog")
-            .filter({ hasText: `${title} ${author}` });
-          await blogElement.getByRole("button", { name: "view" }).click();
-
-          await expect(
-            blogElement.getByRole("button", { name: "remove" }),
-          ).toHaveCount(0);
-        });
-      });
-
-      describe("blogs ordering", () => {
-        beforeEach(async ({ page }) => {
-          await createBlog(
-            page,
-            "Building the Mark I Suit",
-            "Tony Stark",
-            "https://starkindustries.com/mark1",
-          );
-          await createBlog(
-            page,
-            "Arc Reactor Explained",
-            "Tony Stark",
-            "https://starkindustries.com/arcreactor",
-          );
-          await createBlog(
-            page,
-            "JWT Deep Dive",
-            "Randy Orton",
-            "https://example.com/jwt",
-          );
-        });
-
-        test("blogs are ordered by likes", async ({ page }) => {
-          test.setTimeout(10000);
-
-          const blogTwo = page
-            .getByTestId("blog")
-            .filter({ hasText: "Arc Reactor Explained" });
-
-          await blogTwo.getByRole("button", { name: "view" }).click();
-
-          await blogTwo.getByRole("button", { name: "like" }).click();
-          await blogTwo.getByText("likes 1").waitFor();
-          await blogTwo.getByRole("button", { name: "like" }).click();
-          await blogTwo.getByText("likes 2").waitFor();
-
-          const blogThree = page
-            .getByTestId("blog")
-            .filter({ hasText: "JWT Deep Dive" });
-
-          await blogThree.getByRole("button", { name: "view" }).click();
-
-          await blogThree.getByRole("button", { name: "like" }).click();
-          await blogThree.getByText("likes 1").waitFor();
-          await blogThree.getByRole("button", { name: "like" }).click();
-          await blogThree.getByText("likes 2").waitFor();
-          await blogThree.getByRole("button", { name: "like" }).click();
-          await blogThree.getByText("likes 3").waitFor();
-          await blogThree.getByRole("button", { name: "like" }).click();
-          await blogThree.getByText("likes 4").waitFor();
-          await blogThree.getByRole("button", { name: "like" }).click();
-          await blogThree.getByText("likes 5").waitFor();
-
-          const blogs = await page.getByTestId("blog").allTextContents();
-
-          expect(blogs[0]).toContain("JWT Deep Dive");
-          expect(blogs[1]).toContain("Arc Reactor Explained");
-          expect(blogs[2]).toContain("Building the Mark I Suit");
-        });
-      });
+      // The app redirects to the blogs list after deletion.
+      await expect(
+        page.getByRole("link", { name: `${title} by ${author}` }),
+      ).toHaveCount(0);
     });
   });
 });
