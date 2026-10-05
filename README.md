@@ -22,7 +22,8 @@ To simulate a professional engineering environment, this repository utilizes an 
 - **Part 1:** Fundamentals of React (Completed)
 - **Part 2:** Communicating with Server (Completed)
 - **Part 3:** Node.js and Express API Design (In Progress)
-- **Part 5:** Testing React Apps (Completed — exercises 5.1–5.31)
+- **Part 4:** Testing Express Servers, user authentication and testing (Completed)
+- **Part 5:** Testing React Apps (Completed)
 
 ## 🛠️ Tech Stack
 
