@@ -25,11 +25,14 @@ To simulate a professional engineering environment, this repository utilizes an 
 - **Part 4:** Testing Express Servers, user authentication and testing (Completed)
 - **Part 5:** Testing React Apps (Completed)
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Practices
 
-- **Frontend:** React 19, Vite, Axios
-- **Backend:** Node.js, Express.js
-- **Tools:** Git, Ubuntu (Linux), VS Code, Postman / REST Client
+- **Frontend:** React, React Router, Material UI, Emotion, Axios
+- **Backend:** Node.js, Express, MongoDB, Mongoose
+- **Authentication & security:** JSON Web Tokens (JWT), bcrypt, authorization middleware
+- **Testing:** Vitest, React Testing Library, Jest DOM, Supertest, Playwright
+- **Development tools:** Vite, ESLint, Git, Ubuntu (Linux), VS Code, Postman / REST Client
+- **Practices:** REST API design, client-side routing, controlled forms, component and integration testing, browser-based end-to-end testing
 
 ## 👨‍💻 About Me
 
