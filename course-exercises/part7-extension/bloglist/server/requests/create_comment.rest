@@ -1,0 +1,26 @@
+
+@baseUrl=http://localhost:3003
+@blogId=6a465cd0931f93bb31f14026
+
+### Add first comment
+POST {{baseUrl}}/api/blogs/{{blogId}}/comments
+Content-Type: application/json
+
+{
+  "comment": "Great article! Very informative."
+}
+
+###
+
+### Add second comment to the same blog
+POST {{baseUrl}}/api/blogs/{{blogId}}/comments
+Content-Type: application/json
+
+{
+  "comment": "This is working fine now"
+}
+
+###
+
+### Get all blogs and verify comments are persisted
+GET {{baseUrl}}/api/blogs

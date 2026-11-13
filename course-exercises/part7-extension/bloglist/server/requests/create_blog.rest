@@ -1,0 +1,14 @@
+@baseUrl=http://localhost:3003
+POST {{baseUrl}}/api/blogs
+Content-Type: application/json
+
+{
+  "title": "React Rendering Explained",
+  "author": "Dan Abramov",
+  "url": "https://example.com/react-rendering",
+  "likes": 180
+}
+
+
+
+
